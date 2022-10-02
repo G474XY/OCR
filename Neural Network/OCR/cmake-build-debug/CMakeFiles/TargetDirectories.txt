@@ -1,3 +1,3 @@
-C:/Users/virtu/Documents/CLionProjects/OCR/cmake-build-debug/CMakeFiles/OCR.dir
-C:/Users/virtu/Documents/CLionProjects/OCR/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/virtu/Documents/CLionProjects/OCR/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/virtu/Documents/GitHub/OCR/Neural Network/OCR/cmake-build-debug/CMakeFiles/OCR.dir
+C:/Users/virtu/Documents/GitHub/OCR/Neural Network/OCR/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/virtu/Documents/GitHub/OCR/Neural Network/OCR/cmake-build-debug/CMakeFiles/rebuild_cache.dir

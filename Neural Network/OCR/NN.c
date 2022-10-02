@@ -10,22 +10,27 @@
 #include <math.h>
 
 #define numInputs 2
-#define numLayer 1
-#define numHiddenNodes 2
-#define numOutputs 1
+#define numHiddenLayer 1
+#define numHiddenNodes 1
+
+#define numOutputNodes 0
+
 #define numTrainingSets 4
 
+#define learning_rate 0.01
+#define numEpoch
+
 //Stock A = sigmoid(- X*W+B)
-double hiddenLayer[numLayer][numHiddenNodes];
-double outputLayer[numLayer][numOutputs];
+double hiddenLayer[numHiddenLayer][numHiddenNodes];
+double outputLayer[numOutputNodes];
 
 //Stock B
-double hiddenLayerBias[numLayer][numHiddenNodes];
-double outputLayerBias[numLayer][numOutputs];
+double hiddenLayerBias[numHiddenLayer][numHiddenNodes];
+double outputLayerBias[numOutputNodes];
 
 //Stock W
-double hiddenWeight[numLayer][numHiddenNodes][numInputs];
-double outputWeight[numLayer][numHiddenNodes][numOutputs];
+double hiddenWeight[numHiddenLayer][numHiddenNodes][numInputs];
+double outputWeight[numHiddenNodes][numOutputNodes];
 
 
 //+-+-+-+-+-+-+-+-+Fonctions pour neurones+-+-+-+-+-+-+-+-+
@@ -67,9 +72,9 @@ void gradients(double a[], double x[], double y[], double *dw, double *db){
     *dw *= 1/numTrainingSets;
 }
 
-void update(double dw, double db, double *w[], double *b, double learning_rate){ //Non complete
+void update(double dw, double db, double *w[], double *b){
 
-    for (int i = 0; i < numTrainingSets; ++i)
+    for (int i = 0; i < numInputs; ++i)
         *w[i] = *w[i] - learning_rate * dw;
 
     *b = *b - learning_rate * db;
@@ -83,13 +88,44 @@ double random() {
     return ((double) rand() / (double) RAND_MAX);
 }
 
-void initialisation(double *weight)
+void initialisation()
 {
+    // initialisation hidden layer
+    for (int i = 0; i < numHiddenLayer; ++i) {
+        for (int j = 0; j < numHiddenNodes; ++j) {
+            for (int k = 0; k < numInputs; ++k) {
+                hiddenWeight[i][j][k] = random();
+            }
+            hiddenLayerBias[i][j] = random();
+            hiddenLayer[i][j] = random();
+        }
+    }
 
+    // initialisation output layer avec un seul layer de sortie
+    for (int i = 0; i < numHiddenNodes; ++i) {
+        for (int j = 0; j < numOutputNodes; ++j) {
+            outputWeight[i][j] = random();
+        }
+
+        outputLayerBias[i] = random();
+        outputLayer[i] = random();
+    }
 }
+
+//Forward propagation
+
+//Back propagation
+
+//Update
 
 //+-+-+-+-+-+-+-+-+Fonctions pour l'exploitation+-+-+-+-+-+-+-+-+
 
 void artificial_neuron(double x[], double y[]){
+    //Initialisation
+    initialisation();
+
+    for (int j = 0; j < numEpoch; ++j) {
+        
+    }
 
 }

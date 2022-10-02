@@ -26,7 +26,7 @@ void shuffle(int *array, size_t n) {
 
 #define numInputs 2
 #define numHiddenNodes 2
-#define numOutputs 1
+#define numOutputNodes 1
 #define numTrainingSets 4
 
 int main(void) // Remplacer LayerBias par vecteurs !
@@ -34,23 +34,23 @@ int main(void) // Remplacer LayerBias par vecteurs !
     const double learning_rate = 0.1f;
 
     double hiddenLayer[numHiddenNodes];
-    double outputLayer[numOutputs];
+    double outputLayer[numOutputNodes];
 
     double hiddenLayerBias[numHiddenNodes];
-    double outputLayerBias[numOutputs];
+    double outputLayerBias[numOutputNodes];
 
     double hiddenWeight[numInputs][numHiddenNodes];
-    double outputWeight[numHiddenNodes][numOutputs];
+    double outputWeight[numHiddenNodes][numOutputNodes];
 
     double training_inputs[numTrainingSets][numInputs] = {{0.0f, 0.0f},
                                                           {1.0f, 0.0f},
                                                           {0.0f, 1.0f},
                                                           {1.0f, 1.0f}};
 
-    double training_outputs[numTrainingSets][numOutputs] = {{0.0f},
-                                                            {1.0f},
-                                                            {1.0f},
-                                                            {0.0f}};
+    double training_outputs[numTrainingSets][numOutputNodes] = {{0.0f},
+                                                                {1.0f},
+                                                                {1.0f},
+                                                                {0.0f}};
 
     for (int i = 0; i < numInputs; ++i) {
         for (int j = 0; j < numHiddenNodes; ++j) {
@@ -59,12 +59,12 @@ int main(void) // Remplacer LayerBias par vecteurs !
     }
 
     for (int i = 0; i < numHiddenNodes; ++i) {
-        for (int j = 0; j < numOutputs; ++j) {
+        for (int j = 0; j < numOutputNodes; ++j) {
             outputWeight[i][j] = init_weights();
         }
     }
 
-    for (int i = 0; i < numOutputs; ++i) {
+    for (int i = 0; i < numOutputNodes; ++i) {
         outputLayerBias[i] = init_weights();
     }
 
@@ -92,7 +92,7 @@ int main(void) // Remplacer LayerBias par vecteurs !
             }
 
             //Compute output layer activation
-            for (int j = 0; j < numOutputs; ++j) {
+            for (int j = 0; j < numOutputNodes; ++j) {
                 double activation = hiddenLayerBias[j];
                 for (int k = 0; k < numHiddenNodes; ++k) {
                     activation += hiddenLayer[k] * outputWeight[k][j];
@@ -107,9 +107,9 @@ int main(void) // Remplacer LayerBias par vecteurs !
             // Backpropagation
 
             // Compute change in ouput weights
-            double deltaOutput[numOutputs];
+            double deltaOutput[numOutputNodes];
 
-            for (int j = 0; j < numOutputs; ++j) {
+            for (int j = 0; j < numOutputNodes; ++j) {
                 double error = (training_outputs[i][j] - outputLayer[j]);
                 deltaOutput[j] = error * dSigmoid(outputLayerBias[j]);
             }
@@ -119,14 +119,14 @@ int main(void) // Remplacer LayerBias par vecteurs !
 
             for (int j = 0; j < numHiddenNodes; ++j) {
                 double error = 0.0f;
-                for (int k = 0; k < numOutputs; ++k) {
+                for (int k = 0; k < numOutputNodes; ++k) {
                     error += deltaOutput[k] * outputWeight[j][k];
                 }
                 deltaHidden[j] = error * dSigmoid(hiddenLayer[j]);
             }
 
             // Apply change in output weights
-            for (int j = 0; j < numOutputs; ++j) {
+            for (int j = 0; j < numOutputNodes; ++j) {
                 outputLayerBias[j] += deltaOutput[j] * learning_rate;
                 for (int k = 0; k < numHiddenNodes; ++k) {
                     outputWeight[k][j] += hiddenLayer[k] * deltaOutput[j] * learning_rate;
@@ -161,7 +161,7 @@ int main(void) // Remplacer LayerBias par vecteurs !
     }
 
     fputs("Final Output Weights \n", stdout);
-    for (int j = 0; j < numOutputs; ++j) {
+    for (int j = 0; j < numOutputNodes; ++j) {
         fputs("[  ", stdout);
         for (int k = 0; k < numInputs; ++k) {
             printf("%f", outputWeight[k][j]);
@@ -170,7 +170,7 @@ int main(void) // Remplacer LayerBias par vecteurs !
     }
 
     fputs("]\nFinal Output Biases\n", stdout);
-    for (int j = 0; j < numOutputs; ++j) {
+    for (int j = 0; j < numOutputNodes; ++j) {
         printf("%f", outputLayerBias[j]);
     }
 

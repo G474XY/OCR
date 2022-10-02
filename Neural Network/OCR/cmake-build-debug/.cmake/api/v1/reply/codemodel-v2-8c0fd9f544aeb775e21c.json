@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/virtu/Documents/CLionProjects/OCR/cmake-build-debug",
-		"source" : "C:/Users/virtu/Documents/CLionProjects/OCR"
+		"build" : "C:/Users/virtu/Documents/GitHub/OCR/Neural Network/OCR/cmake-build-debug",
+		"source" : "C:/Users/virtu/Documents/GitHub/OCR/Neural Network/OCR"
 	},
 	"version" : 
 	{
