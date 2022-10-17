@@ -21,21 +21,21 @@ char s1[] =
 void solve_test(char grid[])
 {
     print_sudoku(grid);
-    printf("%d\n",solve(grid));
+    printf("%d\n",solveSudoku(grid));
     print_sudoku(grid);
 }
 
 void load(char* path)
 {
     char grid[81];
-    load_sudoku(path,grid);
+    loadSudoku(path,grid);
     solve_test(grid);
 }
 
 void save(char grid[], char* path)
 {
     solve_test(grid);
-    save_sudoku(grid,path);
+    saveSudoku(grid,path);
 }
 
 int main(int argc, char** argv)

@@ -2,13 +2,6 @@
 #include <string.h>
 #include "saver.h"
 
-
-
-
-
-
-
-
 void clear_array(char grid[],int length)
 {
     for(int i = 0; i < length; i++)
@@ -99,8 +92,20 @@ int solve_rec(char grid[],int y, int x,int d)
     return 0;
 }
 
-int solve(char grid[])
+int solveSudoku(char grid[])
 {
     return solve_rec(grid,0,0,0);
 }
+
+
+int loadSudoku(char* path,char grid[])
+{
+    return load_sudoku(path,grid);
+}
+
+int saveSudoku(char grid[], char* path)
+{
+    return save_sudoku(grid,path);
+}
+
 
