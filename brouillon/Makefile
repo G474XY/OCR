@@ -1,25 +1,24 @@
 # Makefile
 
 CC = gcc
-CPPFLAGS = $(shell pkg-config SDL2_image --cflags)
-CFLAGS = -Wall -Wextra -std=c99
+CPPFLAGS =
+CFLAGS = -Wall -Wextra -O3 `pkg-config --cflags sdl2 SDL2_image`
 LDFLAGS =
-LDLIBS = $(shell pkg-config SDL2_image --libs)
+LDLIBS = `pkg-config --libs sdl2 SDL2_image`
 
-SRC = main.c color.c
+all: display grayscale
+
+SRC = display.c grayscale.c
 OBJ = ${SRC:.c=.o}
-DEP = ${SRC:.c=.d}
+EXE = ${SRC:.c=}
 
-main: ${OBJ}
-
--include ${DEP}
+display: display.o
+grayscale: grayscale.o
 
 .PHONY: clean
 
 clean:
 	${RM} ${OBJ}
-	${RM} ${DEP}
-	${RM} main
+	${RM} ${EXE}
 
 # END
-
