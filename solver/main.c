@@ -38,6 +38,14 @@ void save(char grid[], char* path)
     saveSudoku(grid,path);
 }
 
+void loadsolvesave(char *loadpath,char *savepath)
+{
+    char grid[81];
+    loadSudoku(loadpath,grid);
+    solve_test(grid);
+    saveSudoku(grid,savepath);
+}
+
 int main(int argc, char** argv)
 {
     if(argc == 2 && !strcmp(argv[1],"solve"))
@@ -46,6 +54,8 @@ int main(int argc, char** argv)
         save(s1,argv[2]);
     if(argc == 3 && !strcmp(argv[1],"solveload"))
         load(argv[2]);
+    if(argc == 4 && !strcmp(argv[1],"loadsolvesave"))
+        loadsolvesave(argv[2],argv[3]);
     return 0;
 }
 

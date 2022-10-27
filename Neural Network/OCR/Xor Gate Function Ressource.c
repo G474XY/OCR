@@ -29,9 +29,7 @@ void shuffle(int *array, size_t n) {
 #define numOutputNodes 1
 #define numTrainingSets 4
 
-int main(void) // Remplacer LayerBias par vecteurs !
-{
-    const double learning_rate = 0.1f;
+const double learning_rate = 0.1f;
 
     double hiddenLayer[numHiddenNodes];
     double outputLayer[numOutputNodes];
@@ -51,6 +49,181 @@ int main(void) // Remplacer LayerBias par vecteurs !
                                                                 {1.0f},
                                                                 {1.0f},
                                                                 {0.0f}};
+
+//==========Partie Save and Load==========
+
+void print_array(double arr[],int size)
+{
+    printf("[");
+    for(int i = 0; i < size; i++)
+    {
+        printf("%f",*(arr + i));
+        if(i < size - 1)
+            printf(", ");
+    }
+    printf("]\n");
+}
+
+char readnchars(FILE *file,unsigned int n)
+{
+    unsigned int i = 0;
+    while(i < n && !feof(file))
+    {
+        fgetc(file);
+    }
+    return i < n;
+}
+
+double doublefromfile(FILE *file)
+{
+    double res = 0;
+    fscanf(file,"%lf",&res);
+    return res;
+}
+
+char doubleAfromfile(FILE *file,int size,double array[])
+{
+    /*
+    Fills an array of size 'size' with doubles gotten from the file 'file'.
+    Returns 1 if an error occured, 0 else
+    */
+
+    fgetc(file); // {
+    fgetc(file); // \n
+    int i = 0;
+    while(!feof(file) && i < size)
+    {
+        array[i] = doublefromfile(file);
+        fgetc(file); //Le \n
+        i++;
+    }
+    fgetc(file); // }
+    fgetc(file); // \n
+    return i < size;
+}
+
+char doubleAtofile(FILE *file,int size,double array[])
+{
+    /*
+    Fills an array of size 'size' with doubles gotten from the file 'file'.
+    Returns 1 if an error occured, 0 else
+    */
+    fprintf(file,"%s","{\n");
+    int i = 0;
+    while(!feof(file) && i < size)
+    {
+        fprintf(file,"%f",array[i]);
+        fprintf(file,"%c",'\n');
+        i++;
+    }
+    fprintf(file,"%s","}\n");
+    return i < size;
+}
+
+char loadhiddenWeight(FILE *file)
+{
+    readnchars(file,2); // '[\n'
+    int i = 0;
+    char res = 0;
+    while(!feof(file) && !res && i < numInputs)
+    {
+        res = doubleAfromfile(file,numHiddenNodes,hiddenWeight[i]);
+        i++;
+    }
+    res = res || readnchars(file,2); // ']\n;
+    return res || i < numInputs;
+}
+char savehiddenWeight(FILE *file)
+{
+    fprintf(file,"%s","[\n");
+    int i = 0;
+    char res = 0;
+    while(!feof(file) && !res && i < numInputs)
+    {
+        res = doubleAtofile(file,numHiddenNodes,hiddenWeight[i]);
+        i++;
+    }
+    fprintf(file,"%s","]\n");
+    return res || i < numInputs;
+}
+
+char loadoutputWeight(FILE *file)
+{
+    readnchars(file,2); // '[\n'
+    int i = 0;
+    char res = 0;
+    while(!feof(file) && !res && i < numHiddenNodes)
+    {
+        res = doubleAfromfile(file,numOutputNodes,outputWeight[i]);
+        i++;
+    }
+    res = res || readnchars(file,2); // ']\n'
+    return res || i < numOutputNodes;
+}
+char saveoutputWeight(FILE *file)
+{
+    fprintf(file,"%s","[\n");
+    int i = 0;
+    char res = 0;
+    while(!feof(file) && !res && i < numHiddenNodes)
+    {
+        res = doubleAtofile(file,numOutputNodes,outputWeight[i]);
+        i++;
+    }
+    fprintf(file,"%s","]\n");
+    return res || i < numOutputNodes;
+}
+
+char load_XOR(char *path)
+{
+   // Error code = 1
+   // All good code = 0
+    FILE *file = fopen(path,"r");
+    if(file == NULL)
+    {
+        printf("Bad path given to load XOR.\n");
+        return 1; //Error code
+    }
+    char res = 0;
+
+    res = res || doubleAfromfile(file,numHiddenNodes,hiddenLayer);
+    res = res || doubleAfromfile(file,numOutputNodes,outputLayer);
+    res = res || doubleAfromfile(file,numHiddenNodes,hiddenLayerBias);
+    res = res || doubleAfromfile(file,numOutputNodes,outputLayerBias);
+    res = res || loadhiddenWeight(file);
+    res = res || loadoutputWeight(file);
+    
+    return res;
+}
+char save_XOR(char *path)
+{
+   // Error code = 1
+   // All good code = 0
+    FILE *file = fopen(path,"w");
+    if(file == NULL)
+    {
+        printf("Bad path given to save XOR.\n");
+        return 1; //Error code
+    }
+    char res = 0;
+
+    res = res || doubleAtofile(file,numHiddenNodes,hiddenLayer);
+    res = res || doubleAtofile(file,numOutputNodes,outputLayer);
+    res = res || doubleAtofile(file,numHiddenNodes,hiddenLayerBias);
+    res = res || doubleAtofile(file,numOutputNodes,outputLayerBias);
+    res = res || savehiddenWeight(file);
+    res = res || saveoutputWeight(file);
+    
+    return res;
+}
+
+//==========Fin de partie Save and Load==========
+
+
+
+int main(void) // Remplacer LayerBias par vecteurs !
+{
+    
 
     for (int i = 0; i < numInputs; ++i) {
         for (int j = 0; j < numHiddenNodes; ++j) {
@@ -177,4 +350,5 @@ int main(void) // Remplacer LayerBias par vecteurs !
     fputs("]  \n", stdout);
 
     return 0;
-}
+}//*/
+
