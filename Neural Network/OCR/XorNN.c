@@ -30,20 +30,21 @@ void shuffle(int *array, size_t n)
 #define numInputs 2
 #define numHiddenNodes 2
 #define numOutputs 1
+#define numOutputsNodes 1
 #define numTrainingSets 4
 
-int main (void) {
+int main(int argc, char **argv){
 
     const double lr = 0.1f;
     
-    double hiddenLayer[numHiddenNodes];
-    double outputLayer[numOutputs];
+    double* hiddenLayer = malloc(numHiddenNodes * sizeof(double));
+    double* outputLayer = malloc(numOutputsNodes * sizeof(double));
     
-    double hiddenLayerBias[numHiddenNodes];
-    double outputLayerBias[numOutputs];
+    double* hiddenLayerBias = malloc(numHiddenNodes * sizeof(double)); // Biais en fonction de la node
+    double* outputLayerBias = malloc(numOutputs * sizeof(double));
 
-    double hiddenWeights[numInputs][numHiddenNodes];
-    double outputWeights[numHiddenNodes][numOutputs];
+    double** hiddenWeights = malloc(numInputs * numHiddenNodes * sizeof(double)); // Weight en fonction nb hidden nodes et nb input
+    double** outputWeights = malloc(numHiddenNodes * numOutputs * sizeof(double));
     
 
     double training_inputs[numTrainingSets][numInputs] = {{0.0f,0.0f},
@@ -179,6 +180,14 @@ int main (void) {
     }
     
     fputs ("]\n", stdout);
+
+
+    free(hiddenLayerBias);
+    free(hiddenWeights);
+    free(hiddenLayer);
+    free(outputLayerBias);
+    free(outputWeights);
+    free(outputLayer);
 
     return 0;
 }
