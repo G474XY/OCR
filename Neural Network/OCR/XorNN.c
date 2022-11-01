@@ -35,6 +35,7 @@ void shuffle(int *array, size_t n)
 #define numOutputsNodes 1
 #define numTrainingSets 4
 
+//==========DEBUT DE LA PARTIE DE B*****N==========
 //==========LOADING==========
 
 char loadNN(char *path,double *hiddenLayer, double *outputLayer,
@@ -108,7 +109,7 @@ double **init_2arr_weighted(int size1, int size2)
     return res;
 }
 
-//==========END OF MY PART==========
+//==========FIN DE MA PARTIE==========
 
 void init(double** hiddenWeights, double* hiddenLayerBias, double** outputWeights, double* outputLayerBias){
     
