@@ -33,6 +33,13 @@ void shuffle(int *array, size_t n)
 #define numOutputsNodes 1
 #define numTrainingSets 4
 
+
+void forwardpass(){
+
+}
+
+
+
 int main(int argc, char **argv){
 
     const double lr = 0.1f;
@@ -43,9 +50,14 @@ int main(int argc, char **argv){
     double* hiddenLayerBias = malloc(numHiddenNodes * sizeof(double)); // Biais en fonction de la node
     double* outputLayerBias = malloc(numOutputs * sizeof(double));
 
-    double** hiddenWeights = malloc(numInputs * numHiddenNodes * sizeof(double)); // Weight en fonction nb hidden nodes et nb input
-    double** outputWeights = malloc(numHiddenNodes * numOutputs * sizeof(double));
-    
+    double ** hiddenWeights = malloc(numInputs * sizeof(*hiddenWeights));// Weight en fonction nb hidden nodes et nb input
+    for (int i = 0; i < numInputs ; ++i) {
+        hiddenWeights[i] = malloc(numHiddenNodes * sizeof(*hiddenWeights[i]));
+    }
+    double** outputWeights = malloc(numHiddenNodes * sizeof(*outputWeights));
+    for (int i = 0; i < numHiddenNodes ; ++i) {
+        outputWeights[i] = malloc(numOutputs * sizeof(*outputWeights[i]));
+    }
 
     double training_inputs[numTrainingSets][numInputs] = {{0.0f,0.0f},
                                                           {1.0f,0.0f},
@@ -86,7 +98,7 @@ int main(int argc, char **argv){
             int i = trainingSetOrder[x];
             
             // Forward pass
-            
+
             // Compute hidden layer activation
             for (int j=0; j<numHiddenNodes; j++) {
                 double activation = hiddenLayerBias[j];
@@ -95,7 +107,7 @@ int main(int argc, char **argv){
                 }
                 hiddenLayer[j] = sigmoid(activation);
             }
-            
+
             // Compute output layer activation
             for (int j=0; j<numOutputs; j++) {
                 double activation = outputLayerBias[j];
@@ -104,9 +116,9 @@ int main(int argc, char **argv){
                 }
                 outputLayer[j] = sigmoid(activation);
             }
-            
+
             // Print the results from forward pass
-            printf ("Input:%g  Output:%g    Expected Output: %g\n",
+            printf ("Input:%g %g   Output:%g    Expected Output: %g\n",
                     training_inputs[i][0], training_inputs[i][1],
                     outputLayer[0], training_outputs[i][0]);
 
