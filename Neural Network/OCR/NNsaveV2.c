@@ -25,14 +25,24 @@ void print_array_array(double *arr[],int size1,int size2)
 char readnchars(FILE *file,int n)
 {
     int i = 0;
-    printf("readnchars : ");
     while(i < n && !feof(file))
     {
-        printf("%c, ",fgetc(file));
         i++;
     }
-    printf(" end\n");
     return i < n;
+}
+
+char gchar(FILE *file)
+{
+    /*
+    Pour éviter la suite de caractères 13+10 : carriage return line feed.
+    13 -> \n et 10 -> line feed. des fois ce truc pop jsp pk, donc cette
+    fonction y remédie.
+    */
+    char c = fgetc(file);
+    while(c == 10)
+        c = fgetc(file);
+    return c;
 }
 
 double* init_arr(int size)
@@ -81,7 +91,6 @@ double doublefromfile(FILE *file)
 {
     double res = 0;
     fscanf(file,"%lf",&res);
-    printf("double=%f \n",res);
     return res;
 }
 
@@ -91,26 +100,25 @@ char doubleAfromfile(FILE *file,int size,double *array)
     Fills an array of size 'size' with doubles gotten from the file 'file'.
     Returns 1 if an error occured, 0 else
     */
-    printf("{ : %d \n",fgetc(file)); // {
-    printf("\\n : %d \n",fgetc(file)); // \n
+    gchar(file); // {
+    gchar(file); // \n
     int i = 0;
     while(!feof(file) && i < size)
     {
         array[i] = doublefromfile(file);
-        printf("\\n après nombre : %d \n",fgetc(file)); //Le \n
+        gchar(file); //Le \n
         i++;
     }
-    printf("} : %d \n",fgetc(file)); // }
-    printf("\\n : %d \n",fgetc(file)); // \n
+    gchar(file); // }
+    gchar(file); // \n
     return i < size;
 }
 
 char doubleAAfromfile(FILE *file,int size1,int size2,double **array)
 {
     //readnchars(file,2); // '[\n'
-    printf("[ : %d \n",fgetc(file)); // '['
-    printf("\\n : %d \n",fgetc(file)); // '\n'
-    fgetc(file);
+    gchar(file); // '['
+    gchar(file); // '\n'
     int i = 0;
     char err = feof(file);
     while(!err && i < size1)
@@ -119,8 +127,8 @@ char doubleAAfromfile(FILE *file,int size1,int size2,double **array)
         i++;
     }
     //err = readnchars(file,2) || err; // ']\n'
-    printf("] : %d \n",fgetc(file)); //']'
-    printf("\\n : %d \n",fgetc(file)); //'\n'
+    gchar(file); //']'
+    gchar(file); //'\n'
     return err || i < size1;
 }
 

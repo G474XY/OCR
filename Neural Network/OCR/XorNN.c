@@ -112,15 +112,7 @@ double **init_2arr_weighted(int size1, int size2)
 
 void init(double** hiddenWeights, double* hiddenLayerBias, double** outputWeights, double* outputLayerBias){
     
-    /*Je me suis permis de réécrire cela, car cela faisait
-    //une segmentation fault à chaque exécution..
-    //Donc j'ai écrit ces petites fonctions.
-    //Mais comme tu as résolu le problème, je mets tout ça en commentaire.
-    hiddenWeights = init_2arr_weighted(numInputs,numHiddenNodes);
-    outputWeights = init_2arr_weighted(numHiddenNodes,numOutputs);
-    hiddenLayerBias = init_arr_weighted(numHiddenNodes);
-    outputLayerBias = init_arr_weighted(numOutputs);*/
-
+    
     
 }
 
