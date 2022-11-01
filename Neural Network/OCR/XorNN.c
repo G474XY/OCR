@@ -110,40 +110,7 @@ double **init_2arr_weighted(int size1, int size2)
 
 //==========END OF MY PART==========
 
-void forwardpass(){
-
-}
-
-
-
-int main(int argc, char **argv){
-
-    const double lr = 0.1f;
-    
-    double* hiddenLayer = malloc(numHiddenNodes * sizeof(double));
-    double* outputLayer = malloc(numOutputsNodes * sizeof(double));
-    
-    double* hiddenLayerBias = malloc(numHiddenNodes * sizeof(double)); // Biais en fonction de la node
-    double* outputLayerBias = malloc(numOutputs * sizeof(double));
-
-    double ** hiddenWeights = malloc(numInputs * sizeof(*hiddenWeights));// Weight en fonction nb hidden nodes et nb input
-    for (int i = 0; i < numInputs ; ++i) {
-        hiddenWeights[i] = malloc(numHiddenNodes * sizeof(*hiddenWeights[i]));
-    }
-    double** outputWeights = malloc(numHiddenNodes * sizeof(*outputWeights));
-    for (int i = 0; i < numHiddenNodes ; ++i) {
-        outputWeights[i] = malloc(numOutputs * sizeof(*outputWeights[i]));
-    }
-
-    double training_inputs[numTrainingSets][numInputs] = {{0.0f,0.0f},
-                                                          {1.0f,0.0f},
-                                                          {0.0f,1.0f},
-                                                          {1.0f,1.0f}};
-    double training_outputs[numTrainingSets][numOutputs] = {{0.0f},
-                                                            {1.0f},
-                                                            {1.0f},
-                                                            {0.0f}};
-    
+void init(double** hiddenWeights, double* hiddenLayerBias, double** outputWeights, double* outputLayerBias){
     
     /*Je me suis permis de réécrire cela, car cela faisait
     //une segmentation fault à chaque exécution..
@@ -154,88 +121,80 @@ int main(int argc, char **argv){
     hiddenLayerBias = init_arr_weighted(numHiddenNodes);
     outputLayerBias = init_arr_weighted(numOutputs);*/
 
-    loadNN("savetests/XOR2.txt",hiddenLayer,outputLayer,hiddenLayerBias,outputLayerBias,
-    hiddenWeights,outputWeights);
     
-    int trainingSetOrder[] = {0,1,2,3};
-    
-    int numberOfEpochs = 10000;
-    // Train the neural network for a number of epochs
-    for(int epochs=0; epochs < numberOfEpochs; epochs++) {
+}
 
-        // As per SGD, shuffle the order of the training set
-        shuffle(trainingSetOrder,numTrainingSets);
 
-        // Cycle through each of the training set elements
-        for (int x=0; x<numTrainingSets; x++) {
-            
-            int i = trainingSetOrder[x];
-            
-            // Forward pass
+void forwardpass(double training_inputs[numTrainingSets][numInputs], double training_outputs[numTrainingSets][numOutputs], int i, double** hiddenWeights,
+                 double* hiddenLayerBias, double* hiddenLayer, double** outputWeights, double* outputLayerBias,
+                 double* outputLayer){
 
-            // Compute hidden layer activation
-            for (int j=0; j<numHiddenNodes; j++) {
-                double activation = hiddenLayerBias[j];
-                 for (int k=0; k<numInputs; k++) {
-                    activation += training_inputs[i][k] * hiddenWeights[k][j];
-                }
-                hiddenLayer[j] = sigmoid(activation);
-            }
+    // Compute hidden layer activation
+    for (int j=0; j<numHiddenNodes; j++) {
+        double activation = hiddenLayerBias[j];
+        for (int k=0; k<numInputs; k++) {
+            activation += training_inputs[i][k] * hiddenWeights[k][j];
+        }
+        hiddenLayer[j] = sigmoid(activation);
+    }
 
-            // Compute output layer activation
-            for (int j=0; j<numOutputs; j++) {
-                double activation = outputLayerBias[j];
-                for (int k=0; k<numHiddenNodes; k++) {
-                    activation += hiddenLayer[k] * outputWeights[k][j];
-                }
-                outputLayer[j] = sigmoid(activation);
-            }
+    // Compute output layer activation
+    for (int j=0; j<numOutputs; j++) {
+        double activation = outputLayerBias[j];
+        for (int k=0; k<numHiddenNodes; k++) {
+            activation += hiddenLayer[k] * outputWeights[k][j];
+        }
+        outputLayer[j] = sigmoid(activation);
+    }
 
-            // Print the results from forward pass
-            printf ("Input:%g %g   Output:%g    Expected Output: %g\n",
-                    training_inputs[i][0], training_inputs[i][1],
-                    outputLayer[0], training_outputs[i][0]);
+    // Print the results from forward pass
+    printf ("Input:%g %g   Output:%g    Expected Output: %g\n",
+            training_inputs[i][0], training_inputs[i][1],
+            outputLayer[0], training_outputs[i][0]);
+}
 
 
 
-            // Backprop
-            
-            // Compute change in output weights
-            double deltaOutput[numOutputs];
-            for (int j=0; j<numOutputs; j++) {
-                double errorOutput = (training_outputs[i][j] - outputLayer[j]);
-                deltaOutput[j] = errorOutput * dSigmoid(outputLayer[j]);
-            }
-            
-            // Compute change in hidden weights
-            double deltaHidden[numHiddenNodes];
-            for (int j=0; j<numHiddenNodes; j++) {
-                double errorHidden = 0.0f;
-                for(int k=0; k<numOutputs; k++) {
-                    errorHidden += deltaOutput[k] * outputWeights[j][k];
-                }
-                deltaHidden[j] = errorHidden * dSigmoid(hiddenLayer[j]);
-            }
-            
-            // Apply change in output weights
-            for (int j=0; j<numOutputs; j++) {
-                outputLayerBias[j] += deltaOutput[j] * lr;
-                for (int k=0; k<numHiddenNodes; k++) {
-                    outputWeights[k][j] += hiddenLayer[k] * deltaOutput[j] * lr;
-                }
-            }
-            
-            // Apply change in hidden weights
-            for (int j=0; j<numHiddenNodes; j++) {
-                hiddenLayerBias[j] += deltaHidden[j] * lr;
-                for(int k=0; k<numInputs; k++) {
-                    hiddenWeights[k][j] += training_inputs[i][k] * deltaHidden[j] * lr;
-                }
-            }
+void backprop(double training_inputs[numTrainingSets][numInputs], double training_outputs[numTrainingSets][numOutputs], int i, double** hiddenWeights,
+              double* hiddenLayerBias, double* hiddenLayer, double** outputWeights, double* outputLayerBias,
+              double* outputLayer, double lr){
+    // Compute change in output weights
+    double deltaOutput[numOutputs];
+    for (int j=0; j<numOutputs; j++) {
+        double errorOutput = (training_outputs[i][j] - outputLayer[j]);
+        deltaOutput[j] = errorOutput * dSigmoid(outputLayer[j]);
+    }
+
+    // Compute change in hidden weights
+    double deltaHidden[numHiddenNodes];
+    for (int j=0; j<numHiddenNodes; j++) {
+        double errorHidden = 0.0f;
+        for(int k=0; k<numOutputs; k++) {
+            errorHidden += deltaOutput[k] * outputWeights[j][k];
+        }
+        deltaHidden[j] = errorHidden * dSigmoid(hiddenLayer[j]);
+    }
+
+    // Apply change in output weights
+    for (int j=0; j<numOutputs; j++) {
+        outputLayerBias[j] += deltaOutput[j] * lr;
+        for (int k=0; k<numHiddenNodes; k++) {
+            outputWeights[k][j] += hiddenLayer[k] * deltaOutput[j] * lr;
         }
     }
-    
-    // Print final weights after training
+
+    // Apply change in hidden weights
+    for (int j=0; j<numHiddenNodes; j++) {
+        hiddenLayerBias[j] += deltaHidden[j] * lr;
+        for(int k=0; k<numInputs; k++) {
+            hiddenWeights[k][j] += training_inputs[i][k] * deltaHidden[j] * lr;
+        }
+    }
+}
+
+
+void finalprint(double** hiddenWeights, double* hiddenLayerBias, double** outputWeights, double* outputLayerBias){
+
     fputs ("Final Hidden Weights\n[ ", stdout);
     for (int j=0; j<numHiddenNodes; j++) {
         fputs ("[ ", stdout);
@@ -244,7 +203,7 @@ int main(int argc, char **argv){
         }
         fputs ("] ", stdout);
     }
-    
+
     fputs ("]\nFinal Hidden Biases\n[ ", stdout);
     for (int j=0; j<numHiddenNodes; j++) {
         printf ("%f ", hiddenLayerBias[j]);
@@ -262,13 +221,11 @@ int main(int argc, char **argv){
     fputs ("Final Output Biases\n[ ", stdout);
     for (int j=0; j<numOutputs; j++) {
         printf ("%f ", outputLayerBias[j]);
-        
+
     }
-    
+
     fputs ("]\n", stdout);
 
-    saveNN("savetests/XOR2.txt",hiddenLayer,outputLayer,hiddenLayerBias,outputLayerBias,
-    hiddenWeights,outputWeights);
 
     free(hiddenLayerBias);
     free(hiddenWeights);
