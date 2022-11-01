@@ -9,6 +9,18 @@ DEP = ${SRC:.c=.d}
 
 xor: ${OBJ}
 
+spam:
+	./a.out
+	./a.out
+	./a.out
+	./a.out
+	./a.out
+	./a.out
+	./a.out
+	./a.out
+	./a.out
+	./a.out
+
 clean:
 	${RM} ${OBJ}
 	${RM} ${DEP}

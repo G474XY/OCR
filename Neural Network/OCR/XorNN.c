@@ -26,12 +26,17 @@ char loadNN(char *path,double *hiddenLayer, double *outputLayer,
         return 1;
     }
     char res = 0;
-    res = res || doubleAfromfile(file,numHiddenNodes,hiddenLayer);
-    res = res || doubleAfromfile(file,numOutputsNodes,outputLayer);
-    res = res || doubleAfromfile(file,numHiddenNodes,hiddenLayerBias);
-    res = res || doubleAfromfile(file,numOutputs,outputLayerBias);
-    res = res || doubleAAfromfile(file,numInputs,numHiddenNodes,hiddenWeights);
-    res = res || doubleAAfromfile(file,numHiddenNodes,numOutputs,outputWeights);
+    res = doubleAfromfile(file,numHiddenNodes,hiddenLayer);
+    if(!res)
+        res = doubleAfromfile(file,numOutputsNodes,outputLayer);
+    if(!res)
+        res = doubleAfromfile(file,numHiddenNodes,hiddenLayerBias);
+    if(!res)
+        res = doubleAfromfile(file,numOutputs,outputLayerBias);
+    if(!res)
+        res = doubleAAfromfile(file,numInputs,numHiddenNodes,hiddenWeights);
+    if(!res)
+        res = doubleAAfromfile(file,numHiddenNodes,numOutputs,outputWeights);
     fclose(file);
     if(res)
     {
@@ -56,6 +61,8 @@ void saveNN(char *path,double *hiddenLayer, double *outputLayer,
     doubleAtofile(outputLayerBias,numOutputs,file);
     doubleAAtofile(hiddenWeights,numInputs,numHiddenNodes,file);
     doubleAAtofile(outputWeights,numHiddenNodes,numOutputs,file);
+
+    fclose(file);
 }
 
 //==========OTHER==========
@@ -266,6 +273,11 @@ int main(int argc, char **argv){
 
     init(hiddenWeights, hiddenLayerBias, outputWeights, outputLayerBias);
 
+    //==========LOADING FUNCTION==========
+    //loadNN("savetests/XOR3.txt",hiddenLayer,outputLayer,hiddenLayerBias,
+    //outputLayerBias,hiddenWeights,outputWeights);
+    //====================================
+
     int trainingSetOrder[] = {0,1,2,3};
 
     int numberOfEpochs = 100;
@@ -293,6 +305,10 @@ int main(int argc, char **argv){
     // Print final weights after training
     finalprint(hiddenWeights, hiddenLayerBias, outputWeights, outputLayerBias);
 
+    //==========SAVING FUNCTION==========
+    //saveNN("savetests/XOR3.txt",hiddenLayer,outputLayer,hiddenLayerBias,
+    //outputLayerBias,hiddenWeights,outputWeights);
+    //===================================
 
     free(hiddenLayerBias);
     free(hiddenWeights);

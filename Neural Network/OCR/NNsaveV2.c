@@ -40,8 +40,9 @@ char gchar(FILE *file)
     fonction y remédie.
     */
     char c = fgetc(file);
-    while(c == 10)
-        c = fgetc(file);
+    //printf("(%d) : %c\n",c,c);
+    //while(c == 13)
+        //c = fgetc(file);
     return c;
 }
 
@@ -123,7 +124,7 @@ char doubleAAfromfile(FILE *file,int size1,int size2,double **array)
     char err = feof(file);
     while(!err && i < size1)
     {
-        err = doubleAfromfile(file,size2,array[i]) || feof(file);
+        err = doubleAfromfile(file,size2,array[i]);
         i++;
     }
     //err = readnchars(file,2) || err; // ']\n'
@@ -205,9 +206,14 @@ void test2()
 
 //==============
 
-int main()
+/*int main()
 {
     //test();
-    test2();
+    //test2();
+    FILE *file = fopen("savetests/test.txt","r");
+    double res = 0;
+    fscanf(file,"%lf",&res);
+    printf("%lf\n",res);
+    fclose(file);
     return 0;
-}
+}*/
