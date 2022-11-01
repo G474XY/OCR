@@ -4,31 +4,6 @@
 
 #include "NNsaveV2.h"
 
-// Simple network that can learn XOR
-// Feartures : sigmoid activation function, stochastic gradient descent, and mean square error fuction
-
-// Activation function and its derivative
-double sigmoid(double x) { return 1 / (1 + exp(-x)); }
-double dSigmoid(double x) { return x * (1 - x); }
-// Activation function and its derivative
-double init_weight() { return ((double)rand())/((double)RAND_MAX); }
-
-// Shuffle the dataset
-void shuffle(int *array, size_t n)
-{
-    if (n > 1)
-    {
-        size_t i;
-        for (i = 0; i < n - 1; i++)
-        {
-            size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
-            int t = array[j];
-            array[j] = array[i];
-            array[i] = t;
-        }
-    }
-}
-
 #define numInputs 2
 #define numHiddenNodes 2
 #define numOutputs 1
@@ -37,6 +12,8 @@ void shuffle(int *array, size_t n)
 
 //==========DEBUT DE LA PARTIE DE B*****N==========
 //==========LOADING==========
+
+double init_weight();
 
 char loadNN(char *path,double *hiddenLayer, double *outputLayer,
             double *hiddenLayerBias, double *outputLayerBias,
@@ -111,10 +88,48 @@ double **init_2arr_weighted(int size1, int size2)
 
 //==========FIN DE MA PARTIE==========
 
+
+// Simple network that can learn XOR
+// Feartures : sigmoid activation function, stochastic gradient descent, and mean square error fuction
+
+// Activation function and its derivative
+double sigmoid(double x) { return 1 / (1 + exp(-x)); }
+double dSigmoid(double x) { return x * (1 - x); }
+// Activation function and its derivative
+double init_weight() { return ((double)rand())/((double)RAND_MAX); }
+
+// Shuffle the dataset
+void shuffle(int *array, size_t n)
+{
+    if (n > 1)
+    {
+        size_t i;
+        for (i = 0; i < n - 1; i++)
+        {
+            size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+            int t = array[j];
+            array[j] = array[i];
+            array[i] = t;
+        }
+    }
+}
+
+
 void init(double** hiddenWeights, double* hiddenLayerBias, double** outputWeights, double* outputLayerBias){
-    
-    
-    
+    for (int i=0; i<numInputs; i++) {
+        for (int j=0; j<numHiddenNodes; j++) {
+            hiddenWeights[i][j] = init_weight();
+        }
+    }
+    for (int i=0; i<numHiddenNodes; i++) {
+        hiddenLayerBias[i] = init_weight();
+        for (int j=0; j<numOutputs; j++) {
+            outputWeights[i][j] = init_weight();
+        }
+    }
+    for (int i=0; i<numOutputs; i++) {
+        outputLayerBias[i] = init_weight();
+    }
 }
 
 
@@ -218,6 +233,65 @@ void finalprint(double** hiddenWeights, double* hiddenLayerBias, double** output
     }
 
     fputs ("]\n", stdout);
+}
+
+
+int main(int argc, char **argv){
+
+    const double lr = 0.1f;
+
+    double* hiddenLayer = malloc(numHiddenNodes * sizeof(double));
+    double* outputLayer = malloc(numOutputsNodes * sizeof(double));
+
+    double* hiddenLayerBias = malloc(numHiddenNodes * sizeof(double)); // Biais en fonction de la node
+    double* outputLayerBias = malloc(numOutputs * sizeof(double));
+
+    double ** hiddenWeights = malloc(numInputs * sizeof(*hiddenWeights));// Weight en fonction nb hidden nodes et nb input
+    for (int i = 0; i < numInputs ; ++i) {
+        hiddenWeights[i] = malloc(numHiddenNodes * sizeof(*hiddenWeights[i]));
+    }
+    double** outputWeights = malloc(numHiddenNodes * sizeof(*outputWeights));
+    for (int i = 0; i < numHiddenNodes ; ++i) {
+        outputWeights[i] = malloc(numOutputs * sizeof(*outputWeights[i]));
+    }
+
+    double training_inputs[numTrainingSets][numInputs] = {{0.0f,0.0f},
+                                                          {1.0f,0.0f},
+                                                          {0.0f,1.0f},
+                                                          {1.0f,1.0f}};
+    double training_outputs[numTrainingSets][numOutputs] = {{0.0f},
+                                                            {1.0f},
+                                                            {1.0f},
+                                                            {0.0f}};
+
+    init(hiddenWeights, hiddenLayerBias, outputWeights, outputLayerBias);
+
+    int trainingSetOrder[] = {0,1,2,3};
+
+    int numberOfEpochs = 100;
+    // Train the neural network for a number of epochs
+    for(int epochs=0; epochs < numberOfEpochs; epochs++) {
+
+        // As per SGD, shuffle the order of the training set
+        shuffle(trainingSetOrder,numTrainingSets);
+
+        // Cycle through each of the training set elements
+        for (int x=0; x<numTrainingSets; x++) {
+
+            int i = trainingSetOrder[x];
+
+            // Forward pass
+            forwardpass(training_inputs, training_outputs, i, hiddenWeights, hiddenLayerBias, hiddenLayer,
+                        outputWeights, outputLayerBias, outputLayer);
+
+            // Backprop
+            backprop(training_inputs, training_outputs, i, hiddenWeights, hiddenLayerBias, hiddenLayer,
+                     outputWeights, outputLayerBias, outputLayer, lr);
+        }
+    }
+
+    // Print final weights after training
+    finalprint(hiddenWeights, hiddenLayerBias, outputWeights, outputLayerBias);
 
 
     free(hiddenLayerBias);
