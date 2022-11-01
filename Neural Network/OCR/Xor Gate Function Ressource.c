@@ -78,6 +78,7 @@ char readnchars(FILE *file,unsigned int n)
     while(i < n && !feof(file))
     {
         fgetc(file);
+        i++;
     }
     return i < n;
 }
