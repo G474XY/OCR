@@ -3,4 +3,4 @@ project(OCR C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(OCR XorNN.c)
+add_executable(OCR XorNN.c NNsaveV2.c)

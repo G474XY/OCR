@@ -1,25 +1,13 @@
 CC = gcc
-CFLAGS = -Wall -Wextra
+CFLAGS = -Wall -Wextra -02
 LDFLAGS =
 LDLIBS =
 
-SRC = XorNN.c
+SRC = XorNN.c NNsaveV2.c
 OBJ = ${SRC:.c=.o}
 DEP = ${SRC:.c=.d}
 
 xor: ${OBJ}
-
-spam:
-	./a.out
-	./a.out
-	./a.out
-	./a.out
-	./a.out
-	./a.out
-	./a.out
-	./a.out
-	./a.out
-	./a.out
 
 clean:
 	${RM} ${OBJ}

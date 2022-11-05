@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "NNsaveV2.h"
 
@@ -10,8 +12,7 @@
 #define numOutputsNodes 1
 #define numTrainingSets 4
 
-//==========DEBUT DE LA PARTIE DE B*****N==========
-//==========LOADING==========
+// Load functions
 
 double init_weight();
 
@@ -47,7 +48,7 @@ char loadNN(char *path,double *hiddenLayer, double *outputLayer,
     return 0;
 }
 
-//==========SAVING==========
+// Save functions
 
 void saveNN(char *path,double *hiddenLayer, double *outputLayer,
             double *hiddenLayerBias, double *outputLayerBias,
@@ -65,7 +66,6 @@ void saveNN(char *path,double *hiddenLayer, double *outputLayer,
     fclose(file);
 }
 
-//==========OTHER==========
 
 double *init_arr_weighted(int size)
 {
@@ -78,6 +78,7 @@ double *init_arr_weighted(int size)
         res[i] = init_weight();
     return res;
 }
+
 
 double **init_2arr_weighted(int size1, int size2)
 {
@@ -93,17 +94,20 @@ double **init_2arr_weighted(int size1, int size2)
     return res;
 }
 
-//==========FIN DE MA PARTIE==========
-
 
 // Simple network that can learn XOR
 // Feartures : sigmoid activation function, stochastic gradient descent, and mean square error fuction
 
 // Activation function and its derivative
 double sigmoid(double x) { return 1 / (1 + exp(-x)); }
+
+
 double dSigmoid(double x) { return x * (1 - x); }
+
+
 // Activation function and its derivative
 double init_weight() { return ((double)rand())/((double)RAND_MAX); }
+
 
 // Shuffle the dataset
 void shuffle(int *array, size_t n)
@@ -122,6 +126,7 @@ void shuffle(int *array, size_t n)
 }
 
 
+//Init the array
 void init(double** hiddenWeights, double* hiddenLayerBias, double** outputWeights, double* outputLayerBias){
     for (int i=0; i<numInputs; i++) {
         for (int j=0; j<numHiddenNodes; j++) {
@@ -140,7 +145,7 @@ void init(double** hiddenWeights, double* hiddenLayerBias, double** outputWeight
 }
 
 
-void forwardpass(double training_inputs[numTrainingSets][numInputs], double training_outputs[numTrainingSets][numOutputs], int i, double** hiddenWeights,
+void forwardpass(double training_inputs[numTrainingSets][numInputs], int i, double** hiddenWeights,
                  double* hiddenLayerBias, double* hiddenLayer, double** outputWeights, double* outputLayerBias,
                  double* outputLayer){
 
@@ -162,12 +167,7 @@ void forwardpass(double training_inputs[numTrainingSets][numInputs], double trai
         outputLayer[j] = sigmoid(activation);
     }
 
-    // Print the results from forward pass
-    printf ("Input:%g %g   Output:%g    Expected Output: %g\n",
-            training_inputs[i][0], training_inputs[i][1],
-            outputLayer[0], training_outputs[i][0]);
 }
-
 
 
 void backprop(double training_inputs[numTrainingSets][numInputs], double training_outputs[numTrainingSets][numOutputs], int i, double** hiddenWeights,
@@ -243,40 +243,19 @@ void finalprint(double** hiddenWeights, double* hiddenLayerBias, double** output
 }
 
 
-int main(int argc, char **argv){
+void train(double** hiddenWeights, double* hiddenLayerBias, double* hiddenLayer, double** outputWeights,
+           double* outputLayerBias, double* outputLayer){
 
-    const double lr = 0.1f;
+    const double lr = 0.1f; // Define the learning rate
 
-    double* hiddenLayer = malloc(numHiddenNodes * sizeof(double));
-    double* outputLayer = malloc(numOutputsNodes * sizeof(double));
-
-    double* hiddenLayerBias = malloc(numHiddenNodes * sizeof(double)); // Biais en fonction de la node
-    double* outputLayerBias = malloc(numOutputs * sizeof(double));
-
-    double ** hiddenWeights = malloc(numInputs * sizeof(*hiddenWeights));// Weight en fonction nb hidden nodes et nb input
-    for (int i = 0; i < numInputs ; ++i) {
-        hiddenWeights[i] = malloc(numHiddenNodes * sizeof(*hiddenWeights[i]));
-    }
-    double** outputWeights = malloc(numHiddenNodes * sizeof(*outputWeights));
-    for (int i = 0; i < numHiddenNodes ; ++i) {
-        outputWeights[i] = malloc(numOutputs * sizeof(*outputWeights[i]));
-    }
-
-    double training_inputs[numTrainingSets][numInputs] = {{0.0f,0.0f},
+    double training_inputs[numTrainingSets][numInputs] = {{0.0f,0.0f}, // Define the input
                                                           {1.0f,0.0f},
                                                           {0.0f,1.0f},
                                                           {1.0f,1.0f}};
-    double training_outputs[numTrainingSets][numOutputs] = {{0.0f},
+    double training_outputs[numTrainingSets][numOutputs] = {{0.0f},        // Define the expected output
                                                             {1.0f},
                                                             {1.0f},
                                                             {0.0f}};
-
-    init(hiddenWeights, hiddenLayerBias, outputWeights, outputLayerBias);
-
-    //==========LOADING FUNCTION==========
-    //loadNN("savetests/XOR3.txt",hiddenLayer,outputLayer,hiddenLayerBias,
-    //outputLayerBias,hiddenWeights,outputWeights);
-    //====================================
 
     int trainingSetOrder[] = {0,1,2,3};
 
@@ -293,8 +272,13 @@ int main(int argc, char **argv){
             int i = trainingSetOrder[x];
 
             // Forward pass
-            forwardpass(training_inputs, training_outputs, i, hiddenWeights, hiddenLayerBias, hiddenLayer,
+            forwardpass(training_inputs, i, hiddenWeights, hiddenLayerBias, hiddenLayer,
                         outputWeights, outputLayerBias, outputLayer);
+
+            // Print the results from forward pass
+            printf ("Input:%g %g   Output:%g    Expected Output: %g\n",
+                    training_inputs[i][0], training_inputs[i][1],
+                    outputLayer[0], training_outputs[i][0]);
 
             // Backprop
             backprop(training_inputs, training_outputs, i, hiddenWeights, hiddenLayerBias, hiddenLayer,
@@ -304,16 +288,73 @@ int main(int argc, char **argv){
 
     // Print final weights after training
     finalprint(hiddenWeights, hiddenLayerBias, outputWeights, outputLayerBias);
+}
 
-    //==========SAVING FUNCTION==========
-    //saveNN("savetests/XOR3.txt",hiddenLayer,outputLayer,hiddenLayerBias,
-    //outputLayerBias,hiddenWeights,outputWeights);
-    //===================================
 
+int main(int argc, char **argv){
+
+    if(argc < 2 || argc > 3 || argc == 2 && strcmp(argv[1], "-t") != 0 || argc == 3 && (strcmp(argv[1], "0") != 0
+    && strcmp(argv[1], "1")) != 0 || (strcmp(argv[2], "0") != 0 && strcmp(argv[2], "1") != 0)){
+
+        printf("Erreur: mauvais parametres");
+        return 1;
+    }
+
+    double* hiddenLayer = malloc(numHiddenNodes * sizeof(double));  // Value of the input layers
+    double* outputLayer = malloc(numOutputsNodes * sizeof(double)); // Value of the output layers
+
+    double* hiddenLayerBias = malloc(numHiddenNodes * sizeof(double));  // Bias for the hidden layers
+    double* outputLayerBias = malloc(numOutputs * sizeof(double));  // Bias for the output layers
+
+    double ** hiddenWeights = malloc(numInputs * sizeof(*hiddenWeights));   // Weight for the hidden layers
+    for (int i = 0; i < numInputs ; ++i) {
+        hiddenWeights[i] = malloc(numHiddenNodes * sizeof(*hiddenWeights[i]));
+    }
+    double** outputWeights = malloc(numHiddenNodes * sizeof(*outputWeights));   // Weight for the output layers
+    for (int i = 0; i < numHiddenNodes ; ++i) {
+        outputWeights[i] = malloc(numOutputs * sizeof(*outputWeights[i]));
+    }
+
+    if(hiddenWeights == NULL || outputWeights == NULL || hiddenLayerBias == NULL || outputLayerBias == NULL
+    || hiddenLayer == NULL || outputLayerBias == NULL){ // Check if malloc functionned
+
+        printf("Erreur: pas assez de memoire");
+        return  1;
+    }
+
+    if(!access( "savetests/XOR3.txt", F_OK)){   // Check if there is a save file
+        loadNN("savetests/XOR3.txt",hiddenLayer,outputLayer,hiddenLayerBias,    // So load it
+               outputLayerBias,hiddenWeights,outputWeights);
+    }
+    else{
+        init(hiddenWeights, hiddenLayerBias, outputWeights, outputLayerBias);   // Else, use random values
+    }
+
+    if(strcmp(argv[1], "-t") != 0){ // Check if test mode
+        train(hiddenWeights, hiddenLayerBias, hiddenLayer, outputWeights, outputLayerBias, outputLayer);
+        saveNN("savetests/XOR3.txt",hiddenLayer,outputLayer,hiddenLayerBias,
+               outputLayerBias,hiddenWeights,outputWeights);    // Save the training
+    }
+    else{
+        double a1 = strtod(argv[1], NULL);  // Convert the arguments in an input array
+        double a2 = strtod(argv[2], NULL);
+        double input[1][2] = {{a1, a2}};
+        forwardpass(input, 0, hiddenWeights, hiddenLayerBias, hiddenLayer, outputWeights,
+                    outputLayerBias, outputLayer);  // Calcul
+        printf("%d", outputLayer[0] > 0.5f);    //Print Value
+    }
+
+    // Free the memory
     free(hiddenLayerBias);
+    for (int i = 0; i < numInputs ; ++i) {
+        free(hiddenWeights[i]);
+    }
     free(hiddenWeights);
     free(hiddenLayer);
     free(outputLayerBias);
+    for (int i = 0; i < numHiddenNodes ; ++i) {
+        free(outputWeights[i]);
+    }
     free(outputWeights);
     free(outputLayer);
 
