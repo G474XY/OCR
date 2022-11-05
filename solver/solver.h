@@ -10,7 +10,7 @@ int solveSudoku(char grid[]);
 int loadSudoku(char* path,char grid[]);
 
 //Sauvegarde une grille de sudoku dans un fichier path.
-//(est censée) renvoyer toujours 0 : pas d'erreurs.
+//Renvoie 0 si pas d'erreur, 1 sinon.
 int saveSudoku(char grid[], char* path);
 
 #endif
