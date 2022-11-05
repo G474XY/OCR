@@ -55,7 +55,7 @@ int load_sudoku(char* path,char grid[])
     file = fopen(path,"r");
     if(file == NULL)
     {
-        printf("Error : path is null : %s\n",path);
+        printf("Error : bad path given to load sudoku\n");
         return 1;
     }
     int i = 0;
@@ -85,10 +85,15 @@ int load_sudoku(char* path,char grid[])
 
 int save_sudoku(char grid[], char* path)
 {
-    char str[512];
-    sudoku_to_str(grid,str);
     FILE* file;
     file = fopen(path,"w");
+    if(file == NULL)
+    {
+        printf("Error : bad path given to save sudoku\n");
+        return 1;
+    }
+    char str[512];
+    sudoku_to_str(grid,str);
     fprintf(file,"%s",str);
     fclose(file);
     return 0;
