@@ -299,6 +299,16 @@ void binarization(SDL_Surface* surface, int n)
     return (x, y);
 }
 
+//permet de crop une surface
+SDL_Surface* crop_surface(SDL_Surface* sprite_sheet, int x, int y, int width, int height)
+{
+    SDL_Surface* surface = SDL_CreateRGBSurface(sprite_sheet->flags, width, height, sprite_sheet->format->BitsPerPixel, sprite_sheet->format->Rmask, sprite_sheet->format->Gmask, sprite_sheet->format->Bmask, sprite_sheet->format->Amask);
+    SDL_Rect rect = {x, y, width, height};
+    SDL_BlitSurface(sprite_sheet, &rect, surface, 0);
+    return surface;
+}
+    
+    
 int main(int argc, char** argv)
 {
     // Checks the number of arguments.
