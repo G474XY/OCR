@@ -1,1 +1,0 @@
-Fonction update neurone à faire et modifier variables des boucles car aucune idée correspondance
