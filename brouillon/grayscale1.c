@@ -206,7 +206,6 @@ void binarization(SDL_Surface* surface, int n)
     SDL_LockSurface(surface);
     for (int x = 0; x < n; x++)
     {
-        printf("la");
         for (int y = 0; y < n; y++)
         {
             h1 = x*h/n;
@@ -243,6 +242,62 @@ void binarization(SDL_Surface* surface, int n)
     SDL_UnlockSurface(surface);
 }
 
+(int[], int[]) detection(SDL_Surface * surface)
+{
+    int x[4];
+    int y[4];
+    SDL_PixelFormat* format = surface->format;
+    int h = surface->h;
+    int w = surface->w;
+    
+    //pour les x
+    for (int i = 0; i < h; i++)
+    {
+        int sum = 0;
+        for (int j = 0; j < w; j++)
+        {
+            Uint8 r, g, b;
+            SDL_GetRGB(pixels[i*(w)+j], format, &r, &g, &b);
+            if (r == 0)
+                sum += 1;
+        }
+        if (sum > x[0])
+        {
+            x[0] = sum;
+            int k = 1;
+            while (k < 4 && sum >= s[k])
+            {
+                int tmp = x[k];
+                x[k] = x[k-1];
+                x[k-1] = tmp;
+            }
+        }
+        
+    //pour les y    
+    for (int i = 0; i < w; i++)
+    {
+        int sum = 0;
+        for (int j = 0; j < h; j++)
+        {
+            Uint8 r, g, b;
+            SDL_GetRGB(pixels[i*(h)+j], format, &r, &g, &b);
+            if (r == 0)
+                sum += 1;
+        }
+        if (sum > y[0])
+        {
+            y[0] = sum;
+            int k1 = 1;
+            while (k1 < 4 && sum >= y[k1])
+            {
+                int tmp = y[k1];
+                y[k1] = y[k1-1];
+                y[k1-1] = tmp;
+            }
+        }
+    }
+    return (x, y);
+}
 
 int main(int argc, char** argv)
 {
