@@ -299,6 +299,63 @@ void binarization(SDL_Surface* surface, int n)
     return (x, y);
 }
 
+void adaptativeThreshold(SDL_Surface* surface, const double t)
+{
+    const int w = surface->width;
+    const int h = surface->height;
+
+    const int s2 = fmax(w, h) / 16;
+    unsigned long *integral_image =
+        calloc(w * h, sizeof(unsigned long));
+    long sum = 0;
+    unsigned int count = 0;
+    int x1, y1, x2, y2;
+
+    for (unsigned int y = 0; y < h; y++)
+    {
+        sum += surface->pixels[y].r;
+        integral_image[y] = sum;
+    }
+
+    for (int i = 1; i < w; i++)
+    {
+        sum = 0;
+        for (unsigned int j = 0; j < h; j++)
+        {
+            sum += surface->pixels[i*h+j].r;
+            integral_image[i * h + j] =
+                integral_image[(i - 1) * h + j] + sum;
+        }
+    }
+    for (int i = 0; i < w; i++)
+    {
+        for (int j = 0; j < h; j++)
+        {
+            x1 = fmax(i - s2, 1);
+            x2 = fmin(i + s2, w - 1);
+            y1 = fmax(j - s2, 1);
+            y2 = fmin(j + s2, h - 1);
+            count = (x2 - x1) * (y2 - y1);
+            sum = integral_image[x2 * h + y2]
+                - integral_image[x2 * h + (y1 - 1)]
+                - integral_image[(x1 - 1) * h + y2]
+                + integral_image[(x1 - 1) * h + (y1 - 1)];
+
+            // printf("Previous : %u\n", image->pixels[i][j].r);
+            if (surface->pixels[i * h + j].r * count < sum * (1.0 - t))
+            {
+                updatePixelToSameValue(&(surface->pixels[i * h + j]), 0);
+            }
+            else
+            {
+                updatePixelToSameValue(&(surface->pixels[i * h + j]), 255);
+            }
+            // printf("After : %u\n", image->pixels[i][j].r);
+        }
+    }
+    // Free
+    free(integral_image);
+}
 //permet de crop une surface
 SDL_Surface* crop_surface(SDL_Surface* sprite_sheet, int x, int y, int width, int height)
 {
