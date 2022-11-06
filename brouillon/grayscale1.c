@@ -364,7 +364,35 @@ SDL_Surface* crop_surface(SDL_Surface* sprite_sheet, int x, int y, int width, in
     SDL_BlitSurface(sprite_sheet, &rect, surface, 0);
     return surface;
 }
-    
+
+void white_to_black(SDL_Surface* surface)
+{
+    unsigned int w = surface->width;
+    unsigned int h = surface->height;
+    int white = 0;
+    int black = 0;
+
+    for (unsigned int i = 0; i < w; i++)
+    {
+        for (unsigned int j = 0; j < h; j++)
+        {
+            if (surface->pixels[i* h + j].r == 0)
+                black+=1;
+            else
+                white+=1;
+        }
+    }
+    if (white > black)
+    {
+        for (unsigned int k = 0; k < w; k++)
+        {
+            for (unsigned int l = 0; l < h; l++)
+            {
+                surface->pixels[k*h+l]. r = 255 - surface->pixels[k*h+l]);
+            }
+        }
+    }
+}
     
 int main(int argc, char** argv)
 {
