@@ -1,16 +1,16 @@
 # Makefile
 
 CC = gcc
-CPPFLAGS = -MMD
-CFLAGS = -Wall -Wextra
+CPPFLAGS = -lm
+CFLAGS = -Wall -Wextra -o2
 LDFLAGS =
-LDLIBS =
+LDLIBS = -lm
 
 SRC = XorNN.c NNsaveV2.c
 OBJ = ${SRC:.c=.o}
 DEP = ${SRC:.c=.d}
 
-XorNN: ${OBJ}
+all: ${CC} ${CFLAGS} ${SRC} -o main ${LDLIBS}
 
 -include ${DEP}
 
@@ -19,6 +19,6 @@ XorNN: ${OBJ}
 clean:
 	${RM} ${OBJ}
 	${RM} ${DEP}
-	${RM} test
+	${RM} main
 
 # END

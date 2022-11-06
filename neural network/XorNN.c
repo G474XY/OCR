@@ -293,11 +293,19 @@ void train(double** hiddenWeights, double* hiddenLayerBias, double* hiddenLayer,
 
 int main(int argc, char **argv){
 
-    if(argc < 2 || argc > 3 || (argc == 2 && strcmp(argv[1], "-t") != 0) || (argc == 3 && (strcmp(argv[1], "0") != 0
-    && strcmp(argv[1], "1")) != 0) || (strcmp(argv[2], "0") != 0 && strcmp(argv[2], "1") != 0)){
-
-        printf("Erreur: mauvais parametres\n");
-        return 1;
+    if(argc < 2 || argc > 3){
+    	printf("Erreur : mauvais nombre de parametre");
+	return 1;
+    }
+    if(argc == 2 && strcmp(argv[1], "-t") != 0){
+	    printf("Erreur : mode inexistant");
+	    return 2;
+    }
+    if(argc == 3){
+	if((strcmp(argv[1], "0") != 0 && strcmp(argv[1], "1") != 0) || (strcmp(argv[2], "0") != 0 && strcmp(argv[2], "1") != 0)){
+		printf("Erreur : mauvaises entrées");
+		return -1;
+	}
     }
 
     double* hiddenLayer = malloc(numHiddenNodes * sizeof(double));  // Value of the input layers
@@ -330,7 +338,7 @@ int main(int argc, char **argv){
         init(hiddenWeights, hiddenLayerBias, outputWeights, outputLayerBias);   // Else, use random values
     }
 
-    if(strcmp(argv[1], "-t") != 0){ // Check if test mode
+    if(strcmp(argv[1], "-t") == 0){ // Check if test mode
         train(hiddenWeights, hiddenLayerBias, hiddenLayer, outputWeights, outputLayerBias, outputLayer);
         saveNN("savetests/XOR3.txt",hiddenLayer,outputLayer,hiddenLayerBias,
                outputLayerBias,hiddenWeights,outputWeights);    // Save the training
@@ -341,7 +349,7 @@ int main(int argc, char **argv){
         double input[numTrainingSets][numInputs] = {{a1, a2}, {a1, a2}, {a1, a2}, {a1, a2}};
         forwardpass(input, 0, hiddenWeights, hiddenLayerBias, hiddenLayer, outputWeights,
                     outputLayerBias, outputLayer);  // Calcul
-        printf("%d", outputLayer[0] > 0.5f);    //Print Value
+        printf("%f\n", outputLayer[0]);    //Print Value
     }
 
     // Free the memory
