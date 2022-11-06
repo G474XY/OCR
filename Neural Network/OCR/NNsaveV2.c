@@ -91,7 +91,8 @@ void free_3arr(double ***arr,int size1, int size2)
 double doublefromfile(FILE *file)
 {
     double res = 0;
-    fscanf(file,"%lf",&res);
+    int fres = fscanf(file,"%lf",&res);
+    fres++;
     return res;
 }
 
