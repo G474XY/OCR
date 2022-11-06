@@ -296,7 +296,7 @@ int main(int argc, char **argv){
     if(argc < 2 || argc > 3 || argc == 2 && strcmp(argv[1], "-t") != 0 || argc == 3 && (strcmp(argv[1], "0") != 0
     && strcmp(argv[1], "1")) != 0 || (strcmp(argv[2], "0") != 0 && strcmp(argv[2], "1") != 0)){
 
-        printf("Erreur: mauvais parametres");
+        printf("Erreur: mauvais parametres\n");
         return 1;
     }
 

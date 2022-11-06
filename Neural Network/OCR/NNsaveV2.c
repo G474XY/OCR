@@ -142,12 +142,12 @@ void doubletofile(double d, FILE *file)
 
 void doubleAtofile(double *array,int size,FILE *file)
 {
-    fprintf(file,"%s","{\n");
+    fprintf(file,"%s","{ ");
     for(int i = 0; i < size; i++)
     {
         //fprintf(file,"%c",' ');
         doubletofile(array[i],file);
-        fprintf(file,"%c",'\n');
+        fprintf(file,"%c",' ');
     }
     fprintf(file,"%s","}\n");
 }
@@ -209,7 +209,7 @@ void test2()
 /*int main()
 {
     //test();
-    //test2();
+    test2();
     FILE *file = fopen("savetests/test.txt","r");
     double res = 0;
     fscanf(file,"%lf",&res);
