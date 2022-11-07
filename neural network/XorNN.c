@@ -254,7 +254,7 @@ void train(double** hiddenWeights, double* hiddenLayerBias, double* hiddenLayer,
 
     int trainingSetOrder[] = {0,1,2,3};
 
-    int numberOfEpochs = 100;
+    int numberOfEpochs = 1000;
     // Train the neural network for a number of epochs
     for(int epochs=0; epochs < numberOfEpochs; epochs++) {
 
@@ -271,7 +271,7 @@ void train(double** hiddenWeights, double* hiddenLayerBias, double* hiddenLayer,
                         outputWeights, outputLayerBias, outputLayer);
 
             // Print the results from forward pass
-            printf ("Input:%g %g   Output:%g    Expected Output: %g\n",
+            printf ("Input:%g %g   Output:%f    Expected Output: %g\n",
                     training_inputs[i][0], training_inputs[i][1],
                     outputLayer[0], training_outputs[i][0]);
 
@@ -329,7 +329,7 @@ int xor(char **argv){
         double input[numInputs] = {a1, a2};
         forwardpass(input, hiddenWeights, hiddenLayerBias, hiddenLayer, outputWeights,
                     outputLayerBias, outputLayer);  // Calcul
-        printf("%f\n", outputLayer[0]);    //Print Value
+        printf("%d\n", outputLayer[0] > 0.5);    //Print Value
     }
 
     // Free the memory
