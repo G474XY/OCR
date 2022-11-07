@@ -34,7 +34,7 @@ bool is_valid(int x, int y, SDL_Surface* surface)
   SDL_GetRGB(pixels[x*(w)+y], format, &r, &g, &b);
 	if (x < h && y < w && x >= 0 && y >= 0)
 	{
-		if (visited[x][y] == 0 && r == 0)
+		if (visited[x*w+y] == 0 && r == 0)
 		{
 			return true;
 		}
