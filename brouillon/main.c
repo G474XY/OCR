@@ -1,52 +1,109 @@
+#include <err.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <stdbool.h>
-#include <stdio.h>
-int main(int argc, char *args[])
-{
-    SDL_Event event;
 
-    SDL_Init(SDL_INIT_VIDEO);
-    IMG_Init(IMG_INIT_PNG);
-    SDL_Window *window = SDL_CreateWindow("SDL2 Displaying Image",
-                                              SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 1200, 0);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
-    SDL_Surface *image = IMG_Load("sudoku_02.jpeg");
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, image);
-    SDL_FreeSurface(image);
+#include "pretraitement.h"
+
+// Updates the display.
+//
+// renderer: Renderer to draw on.
+// texture: Texture that contains the image.
+void draw(SDL_Renderer* renderer, SDL_Texture* texture)
+{
     SDL_RenderCopy(renderer, texture, NULL, NULL);
     SDL_RenderPresent(renderer);
+}
 
+// Event loop that calls the relevant event handler.
+//
+// renderer: Renderer to draw on.
+// colored: Texture that contains the colored image.
+// grayscale: Texture that contains the grayscale image.
+void event_loop(SDL_Renderer* renderer, SDL_Texture* grayscale)
+{
+    SDL_Event event;
+    SDL_Texture* t = grayscale;
     while (1)
     {
-        SDL_PollEvent(&event);
-        if (event.type == SDL_QUIT)
-        {
-            break;
-        }
+        SDL_WaitEvent(&event);
 
-        if (event.type == SDL_KEYDOWN)
+        switch (event.type)
         {
-            switch (event.key.keysym.sym)
-            {
-            case SDLK_a:
-                SDL_Surface *image1 = IMG_Load("output.png");
-                SDL_Texture *texture1 = SDL_CreateTextureFromSurface(renderer, image1);
-                SDL_FreeSurface(image1);
-                SDL_RenderClear(renderer);
-                SDL_RenderCopy(renderer, texture1, NULL, NULL);
-                SDL_RenderPresent(renderer);
+            case SDL_QUIT:
+                return;
+
+            case SDL_WINDOWEVENT:
+                if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+                    draw(renderer, t);
                 break;
-            }
+            default:
+                draw(renderer, t);
         }
     }
+}
 
+// Loads an image in a surface.
+// The format of the surface is SDL_PIXELFORMAT_RGB888.
+//
+// path: Path of the image.
+SDL_Surface* load_image(const char* path)
+{
+    SDL_Surface* s1 = IMG_Load(path);
+    if (s1 == NULL)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
+    SDL_Surface* s2 = SDL_ConvertSurfaceFormat(s1, SDL_PIXELFORMAT_RGB888, 0);
+    if (s2 == NULL)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
+
+    SDL_FreeSurface(s1);
+    return s2;
+}
+
+int main(int argc, char** argv)
+{
+    // Checks the number of arguments.
+    if (argc != 2)
+        errx(EXIT_FAILURE, "Usage: image-file");
+
+    //Initialize the SDL
+    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
+
+    // Creates a window.
+    SDL_Window* window = SDL_CreateWindow("Dynamic Fractal Canopy", 0, 0,
+      640, 400,SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    if (window == NULL)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
+
+    // Creates a renderer.
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 
+    SDL_RENDERER_ACCELERATED);
+    if (renderer == NULL)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
+
+    // - Create a surface from the colored image.
+    SDL_Surface* s = load_image(argv[1]);
+
+    // - Resize the window according to the size of the image.
+    SDL_SetWindowSize(window, s->w, s->h);
+    // - Create a texture from the colored surface.
+    SDL_Texture* texture1 = SDL_CreateTextureFromSurface(renderer, s);
+    // - Convert the surface into grayscale.
+    surface_to_grayscale(s);
+    flou_gaussien(s);
+    binarization(s,2);
+    // - Create a new texture from the grayscale surface.
+    SDL_Texture* texture2 = SDL_CreateTextureFromSurface(renderer, s);
+    // - Free the surface.
+    SDL_FreeSurface(s);
+    // - Dispatch the events.
+    event_loop(renderer, texture1, texture2);
+    // - Destroy the objects.
+    SDL_DestroyTexture(texture1);
+    SDL_DestroyTexture(texture2);
     SDL_DestroyWindow(window);
-
     SDL_Quit();
 
-    SDL_Color tab_color[][] = GetPixelColor(image);
-    printf("%i", tab_color[234][543]);
+    return EXIT_SUCCESS;
+}
 
-    return 0;
-    }
