@@ -17,9 +17,6 @@ SDL_Surface* crop_surface(SDL_Surface* sprite_sheet)
     return surface;
 }
 
-int h = surface->h;
-int w = surface->w;
-
 int visited[h*w];
 int result[h*w];
 
