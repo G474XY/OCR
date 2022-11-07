@@ -10,7 +10,8 @@ SRC = XorNN.c NNsaveV2.c
 OBJ = ${SRC:.c=.o}
 DEP = ${SRC:.c=.d}
 
-all: ${CC} ${CFLAGS} ${SRC} -o main ${LDLIBS}
+all: 
+	${CC} ${CFLAGS} ${SRC} -o main ${LDLIBS}
 
 -include ${DEP}
 

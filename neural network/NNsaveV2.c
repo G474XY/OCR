@@ -180,41 +180,57 @@ void test()
 void test2()
 {
     int size1 = 3;
-    int size2 = 2;
-    int size3 = 2;
-    double **arr = init_2arr(size1,size2);
-    double **arr2 = init_2arr(size3,size3);
+    int size2 = 3;
+    double arr1[] = {3,2,81};
+    double arr2[] = {8,9,7};
+    double arr3[] = {65,42,21};
+    double arr4[] = {77,11,22};
+    double arr5[] = {4,900,61.2};
+    double arr6[] = {3.14,5.5,42.42};
 
-    FILE *file = fopen("savetests/doubleA3.txt","r");
-    if(doubleAAfromfile(file,size1,size2,arr))
-        printf("Error !\n");
-    if(doubleAAfromfile(file,size3,size3,arr2))
-        printf("Error !\n");
-    print_array_array(arr,size1,size2);
+    double **arr7 = malloc(size1*sizeof(double));
+    arr7[0] = arr1;
+    arr7[1] = arr2;
+    arr7[2] = arr3;
+    
+    double **arr8 = malloc(size1*sizeof(double));
+    arr8[0] = arr4;
+    arr8[1] = arr5;
+    arr8[2] = arr6;
+
+    FILE *file = fopen("savetests/test.txt","w");
+    doubleAAtofile(arr7,size1,size2,file);
+    doubleAAtofile(arr8,size1,size2,file);
+    fclose(file);
+    free(arr7);
+    free(arr8);
+
+    double **arr9 = malloc(size1 * sizeof(double));
+    arr9[0] = malloc(size2 * sizeof(double));
+    arr9[1] = malloc(size2 * sizeof(double));
+    arr9[2] = malloc(size2 * sizeof(double));
+    double **arr10 = init_2arr(size1,size2);
+
+    FILE *file2 = fopen("savetests/test.txt","r");
+    doubleAAfromfile(file2,size1,size2,arr9);
+    doubleAAfromfile(file2,size1,size2,arr10);
+    fclose(file2);
+    print_array_array(arr9,size1,size2);
     printf("\n");
-    print_array_array(arr2,size3,size3);
-    fclose(file);
+    print_array_array(arr10,size1,size2);
 
-    file = fopen("savetests/doubleA5.txt","w");
-
-    doubleAAtofile(arr2,size3,size3,file);
-    doubleAAtofile(arr,size1,size2,file);
-    fclose(file);
-
-    free_2arr(arr,size1);
-    free_2arr(arr2,size3);
+    free(arr9[0]);
+    free(arr9[1]);
+    free(arr9[2]);
+    free(arr9);
+    free_2arr(arr10,size1);
 }
 
 //==============
 
 /*int main()
 {
-    //test();
     test2();
-    FILE *file = fopen("savetests/test.txt","r");
-    double res = 0;
-    fscanf(file,"%lf",&res);
-    printf("%lf\n",res);
-    fclose(file);
+    
     return 0;
 }*/

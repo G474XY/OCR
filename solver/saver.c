@@ -62,7 +62,7 @@ int load_sudoku(char* path,char grid[])
     char c;
     while(!feof(file))
     {
-        c = fgetc(file) - '0';
+        /*c = fgetc(file) - '0';
         if(c < 0 || c > 9)
             continue;
         if(i >= 81)
@@ -71,11 +71,27 @@ int load_sudoku(char* path,char grid[])
             return 1;
         }
         grid[i] = c;
-        i++;
+        i++;*/
+        c = fgetc(file) - '0';
+        if(c >= 0 && c <= 9)
+        {
+            if(i >= 81)
+            {
+                printf("Error : bad sudoku format(too many numbers)(%d)\n",c);
+                return 1;
+            }
+            grid[i] = c;
+            i++;
+        }
+        else if(c + '0' == '.')
+        {
+            grid[i] = 0;
+            i++;
+        }
     }
     if(i < 81)
     {
-        printf("Error : bad sudoku format(not enough numbers)\n");
+        printf("Error : bad sudoku format(not enough numbers)(%d)\n",i);
         return 1;
     }
     fclose(file);
