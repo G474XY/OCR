@@ -97,7 +97,7 @@ int main(int argc, char** argv)
     // - Free the surface.
     SDL_FreeSurface(s);
     // - Dispatch the events.
-    event_loop(renderer, texture1, texture2);
+    event_loop(renderer, texture2);
     // - Destroy the objects.
     SDL_DestroyTexture(texture1);
     SDL_DestroyTexture(texture2);

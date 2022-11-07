@@ -6,13 +6,13 @@ CFLAGS = -Wall -Wextra -g `pkg-config --cflags sdl2 SDL2_image`
 LDFLAGS =
 LDLIBS = `pkg-config --libs sdl2 SDL2_image`
 
-all: main
+all: pretraitement main
 
-SRC = main.c
+SRC = pretraitement.c main.c
 OBJ = ${SRC:.c=.o}
 EXE = ${SRC:.c=}
 
-main: main.o
+main: main.o pretraitement.o
 
 .PHONY: clean
 

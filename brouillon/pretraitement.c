@@ -35,7 +35,7 @@ void surface_to_grayscale(SDL_Surface* surface)
 }
 
 //moyenne d'un pixel avec ces voisins pour le flou gaussien
-static Uint32 moyenne(SDL_Surface *surface, int i, int j, int n)
+Uint32 moyenne(SDL_Surface *surface, int i, int j, int n)
 {
     const int initial_h = SDL_max(i - n, 0);
     const int initial_w = SDL_max(j - n, 0);
