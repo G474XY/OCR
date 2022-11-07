@@ -43,19 +43,19 @@ cmake_force:
 SHELL = cmd.exe
 
 # The CMake executable.
-CMAKE_COMMAND = "C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe"
+CMAKE_COMMAND = C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\cmake\win\bin\cmake.exe
 
 # The command to remove a file.
-RM = "C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f
+RM = C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\cmake\win\bin\cmake.exe -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr"
+CMAKE_SOURCE_DIR = "C:\Users\virtu\Documents\GitHub\OCR\neural network"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\cmake-build-debug"
+CMAKE_BINARY_DIR = "C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug"
 
 # Include any dependencies generated for this target.
 include CMakeFiles/OCR.dir/depend.make
@@ -68,49 +68,65 @@ include CMakeFiles/OCR.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/OCR.dir/flags.make
 
+CMakeFiles/OCR.dir/main.c.obj: CMakeFiles/OCR.dir/flags.make
+CMakeFiles/OCR.dir/main.c.obj: ../main.c
+CMakeFiles/OCR.dir/main.c.obj: CMakeFiles/OCR.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/OCR.dir/main.c.obj"
+	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/OCR.dir/main.c.obj -MF CMakeFiles\OCR.dir\main.c.obj.d -o CMakeFiles\OCR.dir\main.c.obj -c "C:\Users\virtu\Documents\GitHub\OCR\neural network\main.c"
+
+CMakeFiles/OCR.dir/main.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/OCR.dir/main.c.i"
+	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\virtu\Documents\GitHub\OCR\neural network\main.c" > CMakeFiles\OCR.dir\main.c.i
+
+CMakeFiles/OCR.dir/main.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/OCR.dir/main.c.s"
+	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\virtu\Documents\GitHub\OCR\neural network\main.c" -o CMakeFiles\OCR.dir\main.c.s
+
 CMakeFiles/OCR.dir/XorNN.c.obj: CMakeFiles/OCR.dir/flags.make
 CMakeFiles/OCR.dir/XorNN.c.obj: ../XorNN.c
 CMakeFiles/OCR.dir/XorNN.c.obj: CMakeFiles/OCR.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/OCR.dir/XorNN.c.obj"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/OCR.dir/XorNN.c.obj -MF CMakeFiles\OCR.dir\XorNN.c.obj.d -o CMakeFiles\OCR.dir\XorNN.c.obj -c "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\XorNN.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/OCR.dir/XorNN.c.obj"
+	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/OCR.dir/XorNN.c.obj -MF CMakeFiles\OCR.dir\XorNN.c.obj.d -o CMakeFiles\OCR.dir\XorNN.c.obj -c "C:\Users\virtu\Documents\GitHub\OCR\neural network\XorNN.c"
 
 CMakeFiles/OCR.dir/XorNN.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/OCR.dir/XorNN.c.i"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\XorNN.c" > CMakeFiles\OCR.dir\XorNN.c.i
+	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\virtu\Documents\GitHub\OCR\neural network\XorNN.c" > CMakeFiles\OCR.dir\XorNN.c.i
 
 CMakeFiles/OCR.dir/XorNN.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/OCR.dir/XorNN.c.s"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\XorNN.c" -o CMakeFiles\OCR.dir\XorNN.c.s
+	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\virtu\Documents\GitHub\OCR\neural network\XorNN.c" -o CMakeFiles\OCR.dir\XorNN.c.s
 
 CMakeFiles/OCR.dir/NNsaveV2.c.obj: CMakeFiles/OCR.dir/flags.make
 CMakeFiles/OCR.dir/NNsaveV2.c.obj: ../NNsaveV2.c
 CMakeFiles/OCR.dir/NNsaveV2.c.obj: CMakeFiles/OCR.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/OCR.dir/NNsaveV2.c.obj"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/OCR.dir/NNsaveV2.c.obj -MF CMakeFiles\OCR.dir\NNsaveV2.c.obj.d -o CMakeFiles\OCR.dir\NNsaveV2.c.obj -c "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\NNsaveV2.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/OCR.dir/NNsaveV2.c.obj"
+	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/OCR.dir/NNsaveV2.c.obj -MF CMakeFiles\OCR.dir\NNsaveV2.c.obj.d -o CMakeFiles\OCR.dir\NNsaveV2.c.obj -c "C:\Users\virtu\Documents\GitHub\OCR\neural network\NNsaveV2.c"
 
 CMakeFiles/OCR.dir/NNsaveV2.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/OCR.dir/NNsaveV2.c.i"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\NNsaveV2.c" > CMakeFiles\OCR.dir\NNsaveV2.c.i
+	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\virtu\Documents\GitHub\OCR\neural network\NNsaveV2.c" > CMakeFiles\OCR.dir\NNsaveV2.c.i
 
 CMakeFiles/OCR.dir/NNsaveV2.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/OCR.dir/NNsaveV2.c.s"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\NNsaveV2.c" -o CMakeFiles\OCR.dir\NNsaveV2.c.s
+	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\virtu\Documents\GitHub\OCR\neural network\NNsaveV2.c" -o CMakeFiles\OCR.dir\NNsaveV2.c.s
 
 # Object files for target OCR
 OCR_OBJECTS = \
+"CMakeFiles/OCR.dir/main.c.obj" \
 "CMakeFiles/OCR.dir/XorNN.c.obj" \
 "CMakeFiles/OCR.dir/NNsaveV2.c.obj"
 
 # External object files for target OCR
 OCR_EXTERNAL_OBJECTS =
 
+OCR.exe: CMakeFiles/OCR.dir/main.c.obj
 OCR.exe: CMakeFiles/OCR.dir/XorNN.c.obj
 OCR.exe: CMakeFiles/OCR.dir/NNsaveV2.c.obj
 OCR.exe: CMakeFiles/OCR.dir/build.make
 OCR.exe: CMakeFiles/OCR.dir/linklibs.rsp
 OCR.exe: CMakeFiles/OCR.dir/objects1.rsp
 OCR.exe: CMakeFiles/OCR.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable OCR.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable OCR.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\OCR.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -122,6 +138,6 @@ CMakeFiles/OCR.dir/clean:
 .PHONY : CMakeFiles/OCR.dir/clean
 
 CMakeFiles/OCR.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr" "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr" "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\cmake-build-debug" "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\cmake-build-debug" "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\cmake-build-debug\CMakeFiles\OCR.dir\DependInfo.cmake" --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "C:\Users\virtu\Documents\GitHub\OCR\neural network" "C:\Users\virtu\Documents\GitHub\OCR\neural network" "C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug" "C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug" "C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug\CMakeFiles\OCR.dir\DependInfo.cmake" --color=$(COLOR)
 .PHONY : CMakeFiles/OCR.dir/depend
 

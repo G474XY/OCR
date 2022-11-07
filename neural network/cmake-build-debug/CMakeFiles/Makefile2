@@ -44,19 +44,19 @@ cmake_force:
 SHELL = cmd.exe
 
 # The CMake executable.
-CMAKE_COMMAND = "C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe"
+CMAKE_COMMAND = C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\cmake\win\bin\cmake.exe
 
 # The command to remove a file.
-RM = "C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f
+RM = C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\222.4345.21\bin\cmake\win\bin\cmake.exe -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr"
+CMAKE_SOURCE_DIR = "C:\Users\virtu\Documents\GitHub\OCR\neural network"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\cmake-build-debug"
+CMAKE_BINARY_DIR = "C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug"
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -80,14 +80,14 @@ clean: CMakeFiles/OCR.dir/clean
 CMakeFiles/OCR.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\OCR.dir\build.make CMakeFiles/OCR.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\OCR.dir\build.make CMakeFiles/OCR.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir="C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\cmake-build-debug\CMakeFiles" --progress-num=1,2,3 "Built target OCR"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir="C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug\CMakeFiles" --progress-num=1,2,3,4 "Built target OCR"
 .PHONY : CMakeFiles/OCR.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/OCR.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\cmake-build-debug\CMakeFiles" 3
+	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug\CMakeFiles" 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/OCR.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\virtu\Documents\GitHub\OCR\neural network\ocr\cmake-build-debug\CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\virtu\Documents\GitHub\OCR\neural network\cmake-build-debug\CMakeFiles" 0
 .PHONY : CMakeFiles/OCR.dir/rule
 
 # Convenience name for target.

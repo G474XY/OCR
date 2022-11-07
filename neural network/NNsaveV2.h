@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "stdlib.h"
 
 #ifndef NNSAVEV2
 #define NNSAVEV2

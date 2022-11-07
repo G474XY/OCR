@@ -6,7 +6,7 @@ CFLAGS = -Wall -Wextra -o2
 LDFLAGS =
 LDLIBS = -lm
 
-SRC = XorNN.c NNsaveV2.c
+SRC = main.c XorNN.c NNsaveV2.c
 OBJ = ${SRC:.c=.o}
 DEP = ${SRC:.c=.d}
 

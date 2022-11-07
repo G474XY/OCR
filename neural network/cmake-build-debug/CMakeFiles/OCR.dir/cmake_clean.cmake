@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/OCR.dir/NNsaveV2.c.obj.d"
   "CMakeFiles/OCR.dir/XorNN.c.obj"
   "CMakeFiles/OCR.dir/XorNN.c.obj.d"
+  "CMakeFiles/OCR.dir/main.c.obj"
+  "CMakeFiles/OCR.dir/main.c.obj.d"
   "OCR.exe"
   "OCR.exe.manifest"
   "OCR.pdb"

@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include <unistd.h>
-
+#include "XorNN.h"
 #include "NNsaveV2.h"
 
 #define numInputs 2
@@ -145,7 +140,7 @@ void init(double** hiddenWeights, double* hiddenLayerBias, double** outputWeight
 }
 
 
-void forwardpass(double training_inputs[numTrainingSets][numInputs], int i, double** hiddenWeights,
+void forwardpass(double training_inputs[numInputs], double** hiddenWeights,
                  double* hiddenLayerBias, double* hiddenLayer, double** outputWeights, double* outputLayerBias,
                  double* outputLayer){
 
@@ -153,7 +148,7 @@ void forwardpass(double training_inputs[numTrainingSets][numInputs], int i, doub
     for (int j=0; j<numHiddenNodes; j++) {
         double activation = hiddenLayerBias[j];
         for (int k=0; k<numInputs; k++) {
-            activation += training_inputs[i][k] * hiddenWeights[k][j];
+            activation += training_inputs[k] * hiddenWeights[k][j];
         }
         hiddenLayer[j] = sigmoid(activation);
     }
@@ -170,13 +165,13 @@ void forwardpass(double training_inputs[numTrainingSets][numInputs], int i, doub
 }
 
 
-void backprop(double training_inputs[numTrainingSets][numInputs], double training_outputs[numTrainingSets][numOutputs], int i, double** hiddenWeights,
+void backprop(double training_inputs[numInputs], double training_outputs[numOutputs], double** hiddenWeights,
               double* hiddenLayerBias, double* hiddenLayer, double** outputWeights, double* outputLayerBias,
               double* outputLayer, double lr){
     // Compute change in output weights
     double deltaOutput[numOutputs];
     for (int j=0; j<numOutputs; j++) {
-        double errorOutput = (training_outputs[i][j] - outputLayer[j]);
+        double errorOutput = training_outputs[j] - outputLayer[j];
         deltaOutput[j] = errorOutput * dSigmoid(outputLayer[j]);
     }
 
@@ -202,7 +197,7 @@ void backprop(double training_inputs[numTrainingSets][numInputs], double trainin
     for (int j=0; j<numHiddenNodes; j++) {
         hiddenLayerBias[j] += deltaHidden[j] * lr;
         for(int k=0; k<numInputs; k++) {
-            hiddenWeights[k][j] += training_inputs[i][k] * deltaHidden[j] * lr;
+            hiddenWeights[k][j] += training_inputs[k] * deltaHidden[j] * lr;
         }
     }
 }
@@ -272,7 +267,7 @@ void train(double** hiddenWeights, double* hiddenLayerBias, double* hiddenLayer,
             int i = trainingSetOrder[x];
 
             // Forward pass
-            forwardpass(training_inputs, i, hiddenWeights, hiddenLayerBias, hiddenLayer,
+            forwardpass(training_inputs[i], hiddenWeights, hiddenLayerBias, hiddenLayer,
                         outputWeights, outputLayerBias, outputLayer);
 
             // Print the results from forward pass
@@ -281,7 +276,7 @@ void train(double** hiddenWeights, double* hiddenLayerBias, double* hiddenLayer,
                     outputLayer[0], training_outputs[i][0]);
 
             // Backprop
-            backprop(training_inputs, training_outputs, i, hiddenWeights, hiddenLayerBias, hiddenLayer,
+            backprop(training_inputs[i], training_outputs[i], hiddenWeights, hiddenLayerBias, hiddenLayer,
                      outputWeights, outputLayerBias, outputLayer, lr);
         }
     }
@@ -291,22 +286,7 @@ void train(double** hiddenWeights, double* hiddenLayerBias, double* hiddenLayer,
 }
 
 
-int main(int argc, char **argv){
-
-    if(argc < 2 || argc > 3){
-    	printf("Erreur : mauvais nombre de parametre\n");
-	return 1;
-    }
-    if(argc == 2 && strcmp(argv[1], "-t") != 0){
-	    printf("Erreur : mode inexistant\n");
-	    return 2;
-    }
-    if(argc == 3){
-	if((strcmp(argv[1], "0") != 0 && strcmp(argv[1], "1") != 0) || (strcmp(argv[2], "0") != 0 && strcmp(argv[2], "1") != 0)){
-		printf("Erreur : mauvaises entrées\n");
-		return -1;
-	}
-    }
+int xor(char **argv){
 
     double* hiddenLayer = malloc(numHiddenNodes * sizeof(double));  // Value of the input layers
     double* outputLayer = malloc(numOutputsNodes * sizeof(double)); // Value of the output layers
@@ -346,8 +326,8 @@ int main(int argc, char **argv){
     else{
         double a1 = strtod(argv[1], NULL);  // Convert the arguments in an input array
         double a2 = strtod(argv[2], NULL);
-        double input[numTrainingSets][numInputs] = {{a1, a2}, {a1, a2}, {a1, a2}, {a1, a2}};
-        forwardpass(input, 0, hiddenWeights, hiddenLayerBias, hiddenLayer, outputWeights,
+        double input[numInputs] = {a1, a2};
+        forwardpass(input, hiddenWeights, hiddenLayerBias, hiddenLayer, outputWeights,
                     outputLayerBias, outputLayer);  // Calcul
         printf("%f\n", outputLayer[0]);    //Print Value
     }
