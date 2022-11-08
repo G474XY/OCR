@@ -43,7 +43,7 @@ char doubleAfromfile(FILE *file,int size,double *array)
     while(!feof(file) && i < size)
     {
         array[i] = doublefromfile(file);
-        gchar(file); //Le ' '
+        fgetc(file); //Le ' '
         i++;
     }
     read_char(file,'}');
