@@ -5,6 +5,8 @@
 
 const char *ext = "_solved";
 const int lenext = 7;
+const char *savefolder = "solved/";
+const int lensavefolder = 7;
 
 void help_text()
 {
@@ -102,10 +104,11 @@ int _abort()
 
 int loadsolvesave(char *loadpath,char *savepath)
 {
+    printf("Loading grid from '%s'.\n",loadpath);
     char grid[81];
     if(!loadSudoku(loadpath,grid))
     {
-        printf("Original sudoku grid:\n\n");
+        printf("\nOriginal sudoku grid:\n\n");
         print_sudoku(grid);
         //printf("\n");
         int solved = solveSudoku(grid);
@@ -114,9 +117,10 @@ int loadsolvesave(char *loadpath,char *savepath)
         {
             printf("\nSolved sudoku grid:\n\n");
             print_sudoku(grid);
-            printf("\n");
+            //printf("\n");
         }
 
+        printf("Saving result grid to '%s'.\n",savepath);
         if(saveSudoku(grid,savepath))
             return _abort();
     }

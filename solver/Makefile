@@ -12,4 +12,3 @@ all:
 
 clean:
 	rm ${EXE}
-	clear
