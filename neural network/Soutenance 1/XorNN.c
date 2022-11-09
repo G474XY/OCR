@@ -1,5 +1,5 @@
 #include "XorNN.h"
-#include "NNsaveV2.h"
+#include "NNsave.h"
 
 #define numInputs 2
 #define numHiddenNodes 2
@@ -310,8 +310,8 @@ int xor(char **argv){
         return  1;
     }
 
-    if(!access( "savetests/XOR3.txt", F_OK)){   // Check if there is a save file
-        loadNN("savetests/XOR3.txt",hiddenLayer,outputLayer,hiddenLayerBias,    // So load it
+    if(!access( "save/XOR3.txt", F_OK)){   // Check if there is a save file
+        loadNN("save/XOR3.txt",hiddenLayer,outputLayer,hiddenLayerBias,    // So load it
                outputLayerBias,hiddenWeights,outputWeights);
     }
     else{
@@ -320,7 +320,7 @@ int xor(char **argv){
 
     if(strcmp(argv[1], "-t") == 0){ // Check if test mode
         train(hiddenWeights, hiddenLayerBias, hiddenLayer, outputWeights, outputLayerBias, outputLayer);
-        saveNN("savetests/XOR3.txt",hiddenLayer,outputLayer,hiddenLayerBias,
+        saveNN("save/XOR3.txt",hiddenLayer,outputLayer,hiddenLayerBias,
                outputLayerBias,hiddenWeights,outputWeights);    // Save the training
     }
     else{
