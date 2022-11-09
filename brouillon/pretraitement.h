@@ -12,5 +12,6 @@ Uint32 moyenne(SDL_Surface *surface, int i, int j, int n);
 void flou_gaussien(SDL_Surface* surface);
 double find_threshold(SDL_Surface* surface, int h1, int h2, int w1, int w2);
 void binarization(SDL_Surface* surface, int n);
+void white_to_black(SDL_Surface* surface);
 
 # endif

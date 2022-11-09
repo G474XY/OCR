@@ -152,7 +152,6 @@ void binarization(SDL_Surface* surface, int n)
             w1 = y*w/n;
             w2 = (y+1)*w/n;
             int t = (int) find_threshold(surface, h1, h2, w1, w2);
-            printf("%d-%d-%d-%d-%d-%d-%d\n", t, h1, h2, w1, w2, x, y);
             Uint32* pixels = surface->pixels;
             for (int i = h1; i < h2; i++)
             {
@@ -179,4 +178,42 @@ void binarization(SDL_Surface* surface, int n)
         }
     }
     SDL_UnlockSurface(surface);
+}
+
+
+void white_to_black(SDL_Surface* surface)
+{
+    SDL_PixelFormat* format = surface->format;
+    int w = surface->w;
+    int h = surface->h;
+    int white = 0;
+    int black = 0;
+    Uint32* pixels = surface->pixels;
+    for (int i = 0; i < h; i++)
+    {
+        for (int j = 0; j < w; j++)
+        {
+            Uint8 r, g, b;
+            SDL_GetRGB(pixels[i*(w)+j], format, &r, &g, &b);
+            if (r == 0)
+                black+=1;
+            else
+                white+=1;
+        }
+    }
+    if (white > black)
+    {
+        for (int k = 0; k < h; k++)
+        {
+            for (int l = 0; l < w; l++)
+            {
+                Uint8 r, g, b;
+                SDL_GetRGB(pixels[k*(w)+l], format, &r, &g, &b);
+                r = 255 - r;
+                g = 255 - g;
+                b = 255 - b;
+                pixels[k*w+l] = SDL_MapRGB(format,r,g,b);
+            }
+        }
+    }
 }

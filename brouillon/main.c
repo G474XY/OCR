@@ -3,6 +3,7 @@
 #include <SDL2/SDL_image.h>
 
 #include "pretraitement.h"
+#include "detect_grid.h"
 
 // Updates the display.
 //
@@ -88,10 +89,13 @@ int main(int argc, char** argv)
     SDL_SetWindowSize(window, s->w, s->h);
     // - Create a texture from the colored surface.
     SDL_Texture* texture1 = SDL_CreateTextureFromSurface(renderer, s);
-    // - Convert the surface into grayscale.
+    // - Treatement Image.
     surface_to_grayscale(s);
     flou_gaussien(s);
-    binarization(s,2);
+    binarization(s,1);
+    white_to_black(s);
+    SDL_Surface* s1 = crop_surface(s);
+    IMG_SavePNG(s1, "out.png");
     // - Create a new texture from the grayscale surface.
     SDL_Texture* texture2 = SDL_CreateTextureFromSurface(renderer, s);
     // - Free the surface.
