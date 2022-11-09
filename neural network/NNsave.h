@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "stdlib.h"
 
-#ifndef NNSAVEV2
-#define NNSAVEV2
+#ifndef NNSAVE
+#define NNSAVE
 
 char doubleAfromfile(FILE *file,int size,double *array);
 char doubleAAfromfile(FILE *file,int size1,int size2,double **array);

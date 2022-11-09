@@ -1,5 +1,5 @@
 #include "XorNN.h"
-#include "NNsaveV2.h"
+#include "NNsave.h"
 
 #define numInputs 2
 #define numHiddenNodes 2
