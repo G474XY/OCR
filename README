@@ -1,0 +1,6 @@
+=============================XOR=============================
+-Aller dans neural network/soutenance 1/
+-Utiliser 'make' pour compiler le code
+-Taper ./main puis :
+	-t : entrainer le réseau de neurones
+	 x x : où x est 0 ou 1 pour obtenir le résultat
