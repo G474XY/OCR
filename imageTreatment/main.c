@@ -114,6 +114,7 @@ int main(int argc, char** argv)
     white_to_black(s);
     SDL_Texture* texture5 = SDL_CreateTextureFromSurface(renderer, s);
     //crop_surface(s);
+    IMG_SavePNG(s, "out.png");
     // - Free the surface.
     SDL_FreeSurface(s);
     // - Dispatch the events.
