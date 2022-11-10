@@ -47,13 +47,7 @@ void Rotate (int m[], size_t w, size_t h, double angle)
 		j=0;
 		for (;j<w; j++)
 		{
-		size_t v =   (size_t)(((c*i - s*j)*w + (s*i+c*j))+decalx*w+decaly);
-
-
-			if (v<(i*w+j))
-			{
-				m2[i*w + j] = m[(size_t)((c*i - s*j)*w + (s*i+c*j))+decalx*w+decaly ];
-			}
+			m2[i*w + j] = m[(int)((c*i - s*j)*w + (s*i+c*j))+decalx*w+decaly ];
 			//printf("m2[%lu, %lu] : %i \n", i, j, m2[i*w+j]);
 		}
 	}
@@ -82,7 +76,6 @@ SDL_Surface* load_image(const char* path)
 
 int main (int argc, char** argv)
 {
-	/*
 	int m[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
 
 	printMat(m, 4, 4);
@@ -94,7 +87,7 @@ int main (int argc, char** argv)
 	printf("-------------------------\n");
 	printMat(m, 4,4);
 
-*/
+/*
 	// Checks the number of arguments.
      if (argc != 2)
          errx(EXIT_FAILURE, "Usage: image-file");
@@ -133,7 +126,7 @@ int main (int argc, char** argv)
      printMat(m, i, j);
 
 
-
+*/
 
 	return 0;
 
