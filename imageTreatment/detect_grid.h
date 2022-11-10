@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-SDL_Surface* crop_surface(SDL_Surface* sprite_sheet);
+void crop_surface(SDL_Surface* sprite_sheet);
 
 # endif
 

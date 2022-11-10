@@ -144,7 +144,6 @@ void binarization(SDL_Surface* surface, int n)
     SDL_LockSurface(surface);
     for (int x = 0; x < n; x++)
     {
-        printf("la");
         for (int y = 0; y < n; y++)
         {
             h1 = x*h/n;
@@ -159,7 +158,7 @@ void binarization(SDL_Surface* surface, int n)
                 {
                     Uint8 r, g, b;
                     SDL_GetRGB(pixels[i*(w)+j], format, &r, &g, &b);
-                    if (r > t*0.8)
+                    if (r > t)
                     {
                         r = 255;
                         g = 255;

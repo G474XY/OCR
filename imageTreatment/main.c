@@ -20,10 +20,11 @@ void draw(SDL_Renderer* renderer, SDL_Texture* texture)
 // renderer: Renderer to draw on.
 // colored: Texture that contains the colored image.
 // grayscale: Texture that contains the grayscale image.
-void event_loop(SDL_Renderer* renderer, SDL_Texture* grayscale)
+void event_loop(SDL_Renderer* renderer, SDL_Texture* s1, SDL_Texture* s2, 
+        SDL_Texture* s3, SDL_Texture* s4, SDL_Texture* s5)
 {
     SDL_Event event;
-    SDL_Texture* t = grayscale;
+    SDL_Texture* t = s1;
     while (1)
     {
         SDL_WaitEvent(&event);
@@ -36,6 +37,20 @@ void event_loop(SDL_Renderer* renderer, SDL_Texture* grayscale)
             case SDL_WINDOWEVENT:
                 if (event.window.event == SDL_WINDOWEVENT_RESIZED)
                     draw(renderer, t);
+                break;
+
+            case SDL_KEYDOWN:
+                draw(renderer, t);
+                if (t == s1)
+                    t = s2;
+                else if (t == s2)
+                    t = s3;
+                else if (t == s3)
+                    t = s4;
+                else if (t == s4)
+                    t = s5;
+                else
+                    t = s1;
                 break;
             default:
                 draw(renderer, t);
@@ -91,17 +106,18 @@ int main(int argc, char** argv)
     SDL_Texture* texture1 = SDL_CreateTextureFromSurface(renderer, s);
     // - Treatement Image.
     surface_to_grayscale(s);
-    flou_gaussien(s);
-    binarization(s,1);
-    white_to_black(s);
-    SDL_Surface* s1 = crop_surface(s);
-    IMG_SavePNG(s1, "out.png");
-    // - Create a new texture from the grayscale surface.
     SDL_Texture* texture2 = SDL_CreateTextureFromSurface(renderer, s);
+    flou_gaussien(s);
+    SDL_Texture* texture3 = SDL_CreateTextureFromSurface(renderer, s);
+    binarization(s,1);
+    SDL_Texture* texture4 = SDL_CreateTextureFromSurface(renderer, s);
+    white_to_black(s);
+    SDL_Texture* texture5 = SDL_CreateTextureFromSurface(renderer, s);
+    //crop_surface(s);
     // - Free the surface.
     SDL_FreeSurface(s);
     // - Dispatch the events.
-    event_loop(renderer, texture2);
+    event_loop(renderer, texture1, texture2, texture3, texture4, texture5);
     // - Destroy the objects.
     SDL_DestroyTexture(texture1);
     SDL_DestroyTexture(texture2);

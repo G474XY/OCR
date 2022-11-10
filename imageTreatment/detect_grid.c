@@ -132,7 +132,6 @@ void resize_grid(SDL_Surface* surface, int values[])
         }
         i+=1;
     }
-    printf("number = %d\n", number);
 
     //garde que la plus grande zone
     for (int i = 0; i < h;i++)
@@ -182,11 +181,10 @@ void resize_grid(SDL_Surface* surface, int values[])
     values[3] = w2;
     free(mask);
     free(swap);
-    printf("h : %d, w : %d \n", h, w);
 }
 
 
-SDL_Surface* crop_surface(SDL_Surface* sprite_sheet)
+void crop_surface(SDL_Surface* sprite_sheet)
 {
     int values[4];
     resize_grid(sprite_sheet, values);
@@ -198,8 +196,12 @@ SDL_Surface* crop_surface(SDL_Surface* sprite_sheet)
     int y = values[1];
     int height = values[2] - values[0];
     int width = values[3] - values[1];
-    SDL_Surface* surface = SDL_CreateRGBSurface(sprite_sheet->flags, width, height, sprite_sheet->format->BitsPerPixel, sprite_sheet->format->Rmask, sprite_sheet->format->Gmask, sprite_sheet->format->Bmask, sprite_sheet->format->Amask);
-    SDL_Rect rect = {x, y, width, height};
-    SDL_BlitSurface(sprite_sheet, &rect, surface, 0);
-    return surface;
+    if (width > 0 && height > 0)
+    {
+        SDL_Surface* surface = SDL_CreateRGBSurface(sprite_sheet->flags, width, height, sprite_sheet->format->BitsPerPixel, sprite_sheet->format->Rmask, sprite_sheet->format->Gmask, sprite_sheet->format->Bmask, sprite_sheet->format->Amask);
+        SDL_Rect rect = {x, y, width, height};
+        SDL_BlitSurface(sprite_sheet, &rect, surface, 0);
+        IMG_SavePNG(surface, "out.png");
+
+    }
 }
