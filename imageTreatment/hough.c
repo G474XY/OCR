@@ -31,7 +31,7 @@ int* hough(SDL_Surface* surface, size_t* i1, size_t* j1)
 	for (size_t i =0; i<surface->w;i++)
 	{
 		
-		for (size_t j = 0; i<surface->h; j++)
+		for (size_t j = 0; j<surface->h; j++)
 		{
 			
 			Uint32* pixels = surface->pixels;
@@ -40,11 +40,11 @@ int* hough(SDL_Surface* surface, size_t* i1, size_t* j1)
 			SDL_GetRGB(pixels[i*surface->w+j],format, &r,&g,&b);
 			if (r == 255)
 			{
-		        	printf("%lu\n", j);
 				for (int k =0; k<theta; k++)
 				{
 					double rho = i * cos(k*val) + j*sin(k*val);
-					accumulator[(int)((rho)*2*d+k)]++;
+					if ((size_t)((rho)*2*d+k)<len2)
+						accumulator[(size_t)((rho)*2*d+k)]++;
 				}
 			}
 			
@@ -52,9 +52,12 @@ int* hough(SDL_Surface* surface, size_t* i1, size_t* j1)
 	}
 
 
-	i1 = (size_t) d;
-	j1 = (size_t)theta;
 
+
+	*i1 = (size_t) d;
+	*j1 = (size_t)theta;
+
+	printf("%lu", i1);
 	return accumulator;
 
 }
