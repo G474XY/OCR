@@ -5,7 +5,7 @@ LDFLAGS=
 LDLIBS=
 
 SRC=*.c
-EXE=main
+EXE=solver
 
 all:
 	${CC} ${CFLAGS} ${SRC} -o ${EXE}
