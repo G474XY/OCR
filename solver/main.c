@@ -81,21 +81,6 @@ void add_solve_to_path(char *path,char *newpath)
     insert_str(savepath,"_solved",newpath,idot);
 }
 
-
-char s1[] = 
-{
-    1,2,7,0,0,4,5,8,0,
-    5,0,0,7,2,1,0,0,3,
-    4,0,3,0,0,0,0,0,0,
-    2,1,0,0,6,7,0,0,4,
-    0,7,0,0,0,0,2,0,0,
-    6,3,0,0,4,9,0,0,1,
-    3,0,6,0,0,0,0,0,0,
-    0,0,0,1,5,8,0,0,6,
-    0,0,0,0,0,6,9,5,0
-};
-
-
 int _abort()
 {
     printf("Aborting operation.\n");
@@ -110,14 +95,12 @@ int loadsolvesave(char *loadpath,char *savepath)
     {
         printf("\nOriginal sudoku grid:\n\n");
         print_sudoku(grid);
-        //printf("\n");
         int solved = solveSudoku(grid);
         solved_text(solved);
         if(solved)
         {
             printf("\nSolved sudoku grid:\n\n");
             print_sudoku(grid);
-            //printf("\n");
         }
 
         printf("Saving result grid to '%s'.\n",savepath);
