@@ -16,11 +16,6 @@ void sudoku_to_str(char grid[],char str[])
                 str[si] = '.';
             si++;
             gi++;
-            /*if(!(gi % 3) && x < 8)
-            {
-                str[si] = ' ';
-                si++;
-            }*/
         }
         str[si] = '\n';
         si++;
@@ -62,16 +57,6 @@ int load_sudoku(char* path,char grid[])
     char c;
     while(!feof(file))
     {
-        /*c = fgetc(file) - '0';
-        if(c < 0 || c > 9)
-            continue;
-        if(i >= 81)
-        {
-            printf("Error : bad sudoku format(too many numbers)(%d)\n",c);
-            return 1;
-        }
-        grid[i] = c;
-        i++;*/
         c = fgetc(file) - '0';
         if(c >= 0 && c <= 9)
         {
