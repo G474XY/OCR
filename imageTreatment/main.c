@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 	SDL_Surface* s = load_image(argv[1]);
 
 
-	Rotateimg(s, 90);
+	//Rotateimg(s, 90);
 
 	// - Resize the window according to the size of the image.
 	SDL_SetWindowSize(window, s->w, s->h);
