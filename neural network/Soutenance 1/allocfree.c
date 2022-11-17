@@ -1,14 +1,14 @@
 #include <stdlib.h>
 
-unsigned char* _allocArray(size_t size)
+double* _allocArray(size_t size)
 {
-    unsigned char* res = malloc(size * sizeof(unsigned char));
+    double* res = malloc(size * sizeof(double));
     return res;
 }
 
-unsigned char** _allocArrayArray(size_t size1,size_t size2)
+double** _allocArrayArray(size_t size1,size_t size2)
 {
-    unsigned char** res = malloc(size1 * sizeof(unsigned char*));
+    double** res = malloc(size1 * sizeof(double*));
     for(size_t i = 0; i < size1; i++)
     {
         res[i] = _allocArray(size2);
@@ -16,7 +16,7 @@ unsigned char** _allocArrayArray(size_t size1,size_t size2)
     return res;
 }
 
-void _freeArrayArray(unsigned char** arr,size_t size1)
+void _freeArrayArray(double** arr,size_t size1)
 {
     for(size_t i = 0; i < size1; i++)
     {

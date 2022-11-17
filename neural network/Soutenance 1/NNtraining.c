@@ -11,15 +11,15 @@ const size_t uns_char_size = sizeof(unsigned char);
 //=============================
 
 //=======GLOBAL VARIABLES======
-FILE* file = NULL;
-FILE* l_file = NULL;
-unsigned char buff[6];
-unsigned char** img = NULL;
-int num_images = 0;
+FILE* file = NULL; //Le fichier des images
+FILE* l_file = NULL; //Le fichier des labels y étant associés
+unsigned char buff[6]; //Le buffer de lecture
+double** img = NULL; //L'array à 2 dimensions représentant l'image
+//int num_images = 0;
 //=============================
 
 //========TEST FUNCTIONS=======
-void print_img(unsigned char** arr)
+void print_img(double** arr)
 {
     unsigned char b = 0;
     for(int i = 0; i < img_size; i++)
@@ -58,12 +58,7 @@ Renvoie 1 si il y eut une erreur, 0 sinon.
 */
 char read_bytes(FILE* f, size_t bytes)
 {
-    if(fread(buff,uns_char_size,bytes,f) < bytes)
-    {
-        printf("Error : read less bytes than expected.\n");
-        return 1;
-    }
-    return 0;
+    return (fread(buff,uns_char_size,bytes,f) < bytes);
 }
 
 /*
@@ -115,6 +110,7 @@ char file_init()
     read_uint32(file,&tmp); //Nombre de lignes
     read_uint32(file,&tmp); //Nombre de colonnes
 
+    //Fichier de labels
     read_uint32(l_file,&tmp); //Magic Number
     read_uint32(l_file,&tmp); //Nombre de labels
 
@@ -142,7 +138,7 @@ Récupère la prochaine image du fichier et la stocke dans
 l'array donné en paramètre.
 Renvoie 1 si il y eut une erreur, 0 sinon.
 */
-char file_image(unsigned char** arr)
+char file_image(double** arr)
 {
     unsigned char b = 0;
     for(int i = 0; i < img_size; i++)
@@ -151,7 +147,7 @@ char file_image(unsigned char** arr)
         {
             if(read_ubyte(file,&b))
                 return 1;
-            arr[i][j] = (b > 0);
+            arr[i][j] = (double)(b > 0);
         }
     }
     return 0;
@@ -160,10 +156,13 @@ char file_image(unsigned char** arr)
 /*
 Récupère le label de la prochaine image dans le fichier correspondant.
 */
-char file_label(unsigned char* label)
+char file_label(int* label)
 {
     //Lit le prochain byte et le stocke 'dans' label.
-    return read_ubyte(l_file,label);
+    unsigned char b = 0;
+    char error = read_ubyte(l_file,&b);
+    *label = (int)b;
+    return error;
 }
 //=============================
 
@@ -180,10 +179,13 @@ Retourne l'array à deux dimension représentant l'image de
 28*28 caractères.
 0 représente un pixel vide
 1 représente un pixel plein.
+
 Remarque : d'un appel à l'autre, le pointeur ne change pas :
 le tableau n'est alloué qu'une seule fois.
+MAIS c'est utile car lorsque le fichier est entièrement parcouru,
+la fonction renvoie NULL.
 */
-unsigned char** GetNextImage(unsigned char* label)
+double** GetNextImage(int* label)
 {
     if(file == NULL)
     {
@@ -216,11 +218,16 @@ void EndTraining()
 //==========TEST MAIN==========
 /*int main()
 {
-    unsigned char label = 0;
+    int label = 0;
     size_t i = 0;
     while(!(img == NULL && i > 0))
     {
-        GetNextImage(&label);
+        img = GetNextImage(&label);
+        if(i >= 100 && i < 120)
+        {
+            printf("%d\n",label);
+            print_img(img);
+        }
         i++;
     }
     return 0;
