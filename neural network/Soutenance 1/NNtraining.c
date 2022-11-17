@@ -38,6 +38,10 @@ void print_img(unsigned char** arr)
 //=============================
 
 //===========HELPERS===========
+/*
+Récupère un uint32 (unsigned long) depuis les 4 premiers bytes du buffer.
+Bit de poids fort en premier.
+*/
 unsigned long _uint32_from_buff()
 {
     unsigned long var = 0;
@@ -48,13 +52,13 @@ unsigned long _uint32_from_buff()
     return var;
 }
 
-char read_bytes(size_t bytes)
+/*
+Lit une quantité de bytes dans le buffer.
+Renvoie 1 si il y eut une erreur, 0 sinon.
+*/
+char read_bytes(FILE* f, size_t bytes)
 {
-    /*
-    Lit une quantité de bytes dans le buffer.
-    Renvoie 1 si il y eut une erreur, 0 sinon.
-    */
-    if(fread(buff,uns_char_size,bytes,file) < bytes)
+    if(fread(buff,uns_char_size,bytes,f) < bytes)
     {
         printf("Error : read less bytes than expected.\n");
         return 1;
@@ -62,94 +66,125 @@ char read_bytes(size_t bytes)
     return 0;
 }
 
-char read_uint32(unsigned long* ptr)
+/*
+Lit un Uint32 et le stocke 'dans' le pointeur donné.
+Renvoie 1 si il y eut une erreur, 0 sinon.
+*/
+char read_uint32(FILE* f,unsigned long* ptr)
 {
-    /*
-    Lit un Uint32 et le stocke 'dans' le pointeur donné.
-    Renvoie 1 si il y eut une erreur, 0 sinon.
-    */
-    char err = read_bytes(4);
+    char err = read_bytes(f,4);
     *ptr = _uint32_from_buff();
     return err;
 }
 
-unsigned char read_ubyte(unsigned char* ptr)
+/*
+Lit un simple byte et le stocke 'dans' le pointeur donné.
+Renvoie 1 si il y eut une erreur, 0 sinon.
+*/
+char read_ubyte(FILE* f, unsigned char* ptr)
 {
-    /*
-    Lit un simple byte et le stocke 'dans' le pointeur donné.
-    Renvoie 1 si il y eut une erreur, 0 sinon.
-    */
-    char err = read_bytes(1);
+    char err = read_bytes(f,1);
     *ptr = buff[0];
     return err;
 }
 //=============================
 
 //=========SUBFUNCTIONS========
+/*
+Initie la lecture du fichier pour les images.
+Renvoie 1 si il y eut une erreur de path, 0 sinon.
+*/
 char file_init()
 {
-    /*
-    Initie la lecture du fichier pour les images.
-    Renvoie 1 si il y eut une erreur de path, 0 sinon.
-    */
     file = fopen(training_path,"rb"); 
-    //On initie le double array qu'est l'image
+    l_file = fopen(labels_path,"rb");
     if(file == NULL)
     {
         printf("Error : training path doesn't exist\n");
         return 1;
     }
+    if(l_file == NULL)
+    {
+        printf("Error : label path doesn't exist\n");
+        return 1;
+    }
     unsigned long tmp = 0;
-    read_uint32(&tmp); //Magic Number
-    read_uint32(&tmp); //Nombre d'images
-    read_uint32(&tmp); //Nombre de lignes
-    read_uint32(&tmp); //Nombre de colonnes
+    unsigned long tmp2 = 0;
+    read_uint32(file,&tmp); //Magic Number
+    read_uint32(file,&tmp2); //Nombre d'images
+    read_uint32(file,&tmp); //Nombre de lignes
+    read_uint32(file,&tmp); //Nombre de colonnes
+
+    read_uint32(l_file,&tmp); //Magic Number
+    read_uint32(l_file,&tmp); //Nombre de labels
+
+    if(tmp2 != tmp)
+    {
+        printf("Error : reading files with different amounts of data\n");
+        return 1;
+    }
 
     return 0;
 }
 
+/*
+Termine la lecture des fichiers et free les arrays utilisés.
+*/
 void file_end()
 {
+    fclose(file);
+    fclose(l_file);
     _freeArrayArray(img,img_size);
 }
 
+/*
+Récupère la prochaine image du fichier et la stocke dans
+l'array donné en paramètre.
+Renvoie 1 si il y eut une erreur, 0 sinon.
+*/
 char file_image(unsigned char** arr)
 {
-    /*
-    Récupère la prochaine image du fichier et la stocke dans
-    l'array donné en paramètre.
-    Renvoie 1 si il y eut une erreur, 0 sinon.
-    */
     unsigned char b = 0;
-    char err = 0;
     for(int i = 0; i < img_size; i++)
     {
         for(int j = 0; j < img_size; j++)
         {
-            err = read_ubyte(&b);
-            if(err)
+            if(read_ubyte(file,&b))
                 return 1;
             arr[i][j] = (b > 0);
         }
     }
     return 0;
 }
+
+/*
+Récupère le label de la prochaine image dans le fichier correspondant.
+*/
+char file_label(unsigned char* label)
+{
+    //Lit le prochain byte et le stocke 'dans' label.
+    return read_ubyte(l_file,label);
+}
 //=============================
 
 //========MAIN FUNCTION========
-unsigned char** GetNextImage()
+/*
+Fonction à appeler par le réseau de neurones.
+Récupère la prochaine image d'entraînement dans le fichier
+de données ; ouvre celui-ci si première image demandée.
+
+Son unique paramètre est un pointeur vers un unsigned char
+représentant le nombre associé à l'image demandée.
+
+Retourne l'array à deux dimension représentant l'image de
+28*28 caractères.
+0 représente un pixel vide
+1 représente un pixel plein.
+Remarque : d'un appel à l'autre, le pointeur ne change pas :
+le tableau n'est alloué qu'une seule fois.
+*/
+unsigned char** GetNextImage(unsigned char* label)
 {
-    /*
-    Fonction à appeler par le réseau de neurones.
-    Récupère la prochaine image d'entraînement dans le fichier
-    de données ; ouvre celui-ci si première image demandée.
-    
-    Retourne l'array à deux dimension représentant l'image de
-    28*28 caractères.
-    0 représente un pixel vide
-    1 représente un pixel plein.
-    */
-    
     if(file == NULL)
     {
         //Premier appel : il faut initialiser les choses.
@@ -158,26 +193,35 @@ unsigned char** GetNextImage()
     }
 
     //On lit la prochaine image du fichier
-    if(file_image(img))
+    if(file_image(img) || file_label(label))
     {
         //Si il y a une erreur (incluant la fin de parcours)
         file_end(); //On clôture le parcours (et on free l'image)
         return NULL; //On fait comprendre au réseau
         //qu'il faut arrêter d'appeler des images.
     }
-    /*if(i < 100)
-        print_img(img);*/
 
     return img; //L'image obtenue est renvoyée.
+}
+
+/*
+Termine la lecture des fichiers et free l'image utilisée.
+*/
+void EndTraining()
+{
+    file_end();
 }
 //=============================
 
 //==========TEST MAIN==========
 /*int main()
 {
-    for(int i = 0; i < 10000; i++)
+    unsigned char label = 0;
+    size_t i = 0;
+    while(!(img == NULL && i > 0))
     {
-        GetNextImage(i);
+        GetNextImage(&label);
+        i++;
     }
     return 0;
 }*/
