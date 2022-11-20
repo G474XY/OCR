@@ -14,7 +14,15 @@
 
 #define MAX(x,y) ((x)>(y)?(x):(y))
 
-double getmax(double* a, int len) {
+double getmax1(neuron* a, int len) {
+    double max = a[0].value;
+    for (int i = 0; i < len; i++) {
+        max = a[i].value > max ? a[i].value : max;
+    }
+    return max;
+}
+
+double getmax2(double* a, int len) {
     double max = a[0];
     for (int i = 0; i < len; i++) {
         max = a[i] > max ? a[i] : max;
@@ -22,20 +30,41 @@ double getmax(double* a, int len) {
     return max;
 }
 
-void LeakyReLU(neuron *neuron, double z, double alpha) {
-    neuron->value = MAX(alpha * z, z);
+double LeakyReLU( double z, double alpha){
+    return MAX(alpha * z, z);
+}
+
+double Z1(neuron neurone, neuron* input){
+    double res = 0;
+
+    for (int i = 0; i < neurone.weight_length; i++) {
+            res += neurone.weight[i] * input[i].value;
+    }
+
+    return res + neurone.bias;
+}
+
+double Z2(neuron neuron, double* input){
+    double res = 0;
+
+    for (int i = 0; i < neuron.weight_length; i++) {
+        res += neuron.weight[i] * input[i];
+    }
+
+    return res + neuron.bias;
 }
 
 void dsLeakyReLU(neuron *neuron, double z, double alpha) {
     neuron->value = z > 0 ? 1 : alpha;
 }
 
-double* softmax(double* input, int len){
+double* softmax(neuron* input, int len){
     double* res = malloc(sizeof(double) * len);
-    double t = getmax(input, len);
+
+    double t = getmax1(input, len);
 
     for (int i = 0; i < len; i++) {
-        res[i] = exp(input[i] - t);
+        res[i] = exp(input[i].value - t);
     }
 
     double sumexp = 0;
@@ -52,7 +81,24 @@ double* softmax(double* input, int len){
 
 void dssoftmax(){}
 
-void forwardpass(layer* a){
+
+void forwardpass(network a, double* input, double learning_rate){
+
+    //Input Layer
+    for (int i = 0; i < a.array[0].length; ++i) {
+        a.array[0].array[i].value = LeakyReLU(Z2(a.array[0].array[i], input), learning_rate);
+    }
+
+    //Hidden Layer
+    for (int i = 1; i < a.length-1; ++i) {
+        for (int j = 0; j < a.array[i].length; ++j) {
+            a.array[i].array[j].value = LeakyReLU(Z1(a.array[i].array[j], a.array[i-1].array), learning_rate);
+        }
+    }
+
+    //Output Layer
+    a.array[a.length-1].array[0].value = getmax2(
+            softmax(a.array[a.length-1].array, a.array[a.length-1].length), a.array[a.length-1].length);
 
 }
 
@@ -118,7 +164,7 @@ network initialisation(){
 
 int main(){
 
-    //const double learning_rate = 0.1f;
+    const double learning_rate = 0.1f;
     network a = initialisation();
 
     return 0;
