@@ -33,7 +33,7 @@ void dsLeakyReLU(neuron *neuron, double z, double alpha) {
 }
 
 double* softmax(double* input, int len){
-    double res[len];
+    double res[len]; //Plutot un malloc nan ?
     double t = getmax(input, len);
 
     for (int i = 0; i < len; i++) {
@@ -117,7 +117,7 @@ layer* init(){
     return a;
 }
 
-+int main(){
+int main(){
 
     //const double learning_rate = 0.1f;
     layer * a = init();
