@@ -9,16 +9,14 @@
 #define nbHLayer 3
 #define nbOLayer 1
 
-#define nbHNode1 784
-#define nbHNode2 392
-#define nbHNode3 196
+#define nbHNode 784
 #define nbONode 1
 
 #define MAX(x,y) ((x)>(y)?(x):(y))
 
 double getmax(double* a, int len) {
     double max = a[0];
-    for (int i = 0; i < a; i++) {
+    for (int i = 0; i < len; i++) {
         max = a[i] > max ? a[i] : max;
     }
     return max;
@@ -33,7 +31,7 @@ void dsLeakyReLU(neuron *neuron, double z, double alpha) {
 }
 
 double* softmax(double* input, int len){
-    double res[len]; //Plutot un malloc nan ?
+    double* res = malloc(sizeof(double) * len);
     double t = getmax(input, len);
 
     for (int i = 0; i < len; i++) {
@@ -54,74 +52,74 @@ double* softmax(double* input, int len){
 
 void dssoftmax(){}
 
-void forwardpass(){}
+void forwardpass(layer* a){
+
+}
 
 void backwardpass(){}
 
 void shuffle(){}
 
-layer* init(){
-    layer* a = malloc(sizeof(layer) * (nbILayer + nbHLayer + nbOLayer));
+neuron neuron_init(long nb_weight){
+    neuron* a = malloc(sizeof(neuron));
+    a->value = 0;
+    a->bias = 1;//Random--------------------------------------------------
+    a->weight_length = nb_weight;
+    a->weight = malloc(sizeof(double) * nb_weight);
+    for(int k = 0; k < nb_weight; k++) {
+        a->weight[k] = 1;//Random--------------------------------------------------
+    }
+    return *a;
+}
+
+layer layer_init(long nb_neuron, long nb_weight){
+    layer* a = malloc(sizeof(layer));
+    a->length = nb_neuron;
+    a->array = malloc(sizeof(neuron) * nb_neuron);
+    for (int i = 0; i < nb_neuron; i++) {
+        a->array[i] = neuron_init(nb_weight);
+    }
+    return *a;
+}
+
+network initialisation(){
+
+    long nb_layer = nbILayer + nbHLayer + nbOLayer;
+
+    network* a = malloc(sizeof(network) * nb_layer);
+    a->length = nb_layer;
+    a->array = malloc(sizeof(layer) * a->length);
+
     long n = 0;
 
-    for (long j = 0; j < nbInput; ++j) {
-        a[n].array[j].bias = 0; //random value ---------------------------------------------
-        a[n].array[j].value = 0;
-        a[n].array[j].weight = malloc(sizeof(double) * nbInput);
-        for (long k = 0; k < nbInput; ++k) {
-            a[n].array[j].weight[k] = 0; //random value ---------------------------------------------
-        }
-    }
-    n++;
-
-    //------------------------------- 1e couche hidden -------------------------------
-    a[n].length = 0;
-    a[n].array = malloc(sizeof(neuron) * nbHNode1);
-
-    for (long j = 0; j < nbHNode1; ++j) {
-        a[n].array[j].bias = 0; //random value ---------------------------------------------
-        a[n].array[j].value = 0;
-        a[n].array[j].weight = malloc(sizeof(double) * nbInput);
-        for (long k = 0; k < nbInput; ++k) {
-            a[n].array[j].weight[k] = 0; //random value ---------------------------------------------
-        }
-    }
-    n++;
-
-    for (long i = 1; i < nbHLayer; ++i) {
-        a[n].length = 0;
-        a[n].array = malloc(sizeof(neuron) * nbHNode1);
-        for (long j = 0; j < nbInput; ++j) {
-            a[n].array[j].bias = 0; //random value ---------------------------------------------
-            a[n].array[j].value = 0;
-            a[n].array[j].weight = malloc(sizeof(double) * nbInput);
-            for (long k = 0; k < nbInput; ++k) {
-                a[n].array[j].weight[k] = 0; //random value ---------------------------------------------
-            }
-        }
+    //------------------------- I Layer -------------------------
+    for (int i = 0; i < nbILayer; i++) {
+        a->array[n] = layer_init(nbInput, nbInput);
         n++;
     }
 
-    //------------------------------- couche output -------------------------------
+    //------------------------- H Layer -------------------------
+    a->array[n] = layer_init(nbHNode, nbInput);
+    n++;
 
-    a[n].length = 0;
-    a[n].array = malloc(sizeof(neuron) * nbONode);
-
-    a[n].array[0].bias = 0; //random value ---------------------------------------------
-    a[n].array[0].value = 0;
-    a[n].array[0].weight = malloc(sizeof(double) * nbHNode1);
-    for (long k = 0; k < nbInput; ++k) {
-        a[n].array[0].weight[k] = 0; //random value ---------------------------------------------
+    for (int i = 1; i < nbHLayer; i++) {
+        a->array[n] = layer_init(nbHNode, nbHNode);
+        n++;
     }
 
-    return a;
+    //------------------------- O Layer -------------------------
+    for (int i = 0; i < nbOLayer; i++) {
+        a->array[n] = layer_init(nbONode, nbHNode);
+        n++;
+    }
+
+    return *a;
 }
 
 int main(){
 
     //const double learning_rate = 0.1f;
-    layer * a = init();
-    printf("Hello World");
+    network a = initialisation();
 
     return 0;
 }

@@ -7,6 +7,7 @@
 
 typedef struct neuron neuron;
 struct neuron{
+    long weight_length;
     double* weight;
     double bias;
     double value;
@@ -15,6 +16,12 @@ struct neuron{
 typedef struct layer layer;
 struct layer{
     neuron* array;
+    long length;
+};
+
+typedef struct network network;
+struct network {
+    layer* array;
     long length;
 };
 
