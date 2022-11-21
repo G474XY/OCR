@@ -15,13 +15,13 @@ struct neuron{
 
 typedef struct layer layer;
 struct layer{
-    neuron* array;
+    neuron** array;
     long length;
 };
 
 typedef struct network network;
 struct network {
-    layer* array;
+    layer** array;
     long length;
 };
 
