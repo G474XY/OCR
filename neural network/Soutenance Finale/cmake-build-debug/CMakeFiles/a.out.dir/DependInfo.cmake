@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "C:/Users/virtu/Documents/GitHub/OCR/neural network/Soutenance Finale/NN.c" "CMakeFiles/a.out.dir/NN.c.obj" "gcc" "CMakeFiles/a.out.dir/NN.c.obj.d"
+  "C:/Users/virtu/Documents/GitHub/neural network/soutenance Finale/NN.c" "CMakeFiles/a.out.dir/NN.c.obj" "gcc" "CMakeFiles/a.out.dir/NN.c.obj.d"
   )
 
 # Targets to which this target links.

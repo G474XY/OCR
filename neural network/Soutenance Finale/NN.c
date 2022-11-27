@@ -9,8 +9,8 @@
 #define nbHLayer 3
 #define nbOLayer 1
 
-#define nbHNode 784
-#define nbONode 1
+#define nbHNode 16
+#define nbONode 10
 
 #define MAX(x,y) ((x)>(y)?(x):(y))
 
@@ -30,7 +30,7 @@ double getmax2(double* a, int len) {
     return max;
 }
 
-double LeakyReLU( double z, double alpha){
+double LeakyReLU(double z, double alpha){
     return MAX(alpha * z, z);
 }
 
@@ -79,34 +79,79 @@ double* softmax(neuron* input, int len){
     return res;
 }
 
-void dssoftmax(){}
+//Log Loss cost function
+double cost(double* get, double* expected){
+    double res = 0;
+    for (int i = 0; i < nbONode; ++i) {
+        res += get[i] * log(expected[i]) + (1 - get[i]) * log(1 - expected[i]);
+    }
+    res *= (1./nbONode);
+    return res;
+}
+
+double dssoftmax(double* array, int indice, double sum){ //result array of softmax function and indice of the current calc value from softmax too
+
+    double partial_sum = 0;
+    for (int i = 0; i < nbONode; ++i) {
+        if(i != indice)
+            partial_sum += array[i];
+    }
+
+    return (array[indice] * partial_sum) / pow(sum, 2);
+}
 
 
 void forwardpass(network a, double* input, double learning_rate){
 
     //Input Layer
-    for (int i = 0; i < a.array[0].length; ++i) {
-        a.array[0].array[i].value = LeakyReLU(Z2(a.array[0].array[i], input), learning_rate);
+    for (int i = 0; i < a.array[0]->length; ++i) {
+        a.array[0]->array[i]->value = LeakyReLU(Z2(*a.array[0]->array[i], input), learning_rate);
     }
 
     //Hidden Layer
     for (int i = 1; i < a.length-1; ++i) {
-        for (int j = 0; j < a.array[i].length; ++j) {
-            a.array[i].array[j].value = LeakyReLU(Z1(a.array[i].array[j], a.array[i-1].array), learning_rate);
+        for (int j = 0; j < a.array[i]->length; ++j) {
+            a.array[i]->array[j]->value = LeakyReLU(Z1(*a.array[i]->array[j], *a.array[i-1]->array), learning_rate);
         }
     }
 
-    //Output Layer
-    a.array[a.length-1].array[0].value = getmax2(
-            softmax(a.array[a.length-1].array, a.array[a.length-1].length), a.array[a.length-1].length);
+    //Output Layer //Pb là
+    a.array[a.length-1]->array[0]->value = getmax2(
+            softmax(*a.array[a.length-1]->array, a.array[a.length-1]->length), a.array[a.length-1]->length);
 
 }
 
-void backwardpass(){}
+void backwardpass(network a, double* get, double* expected){
+
+    //Output Layer
+
+    double error = cost(get,expected);
+
+    //Get the sum
+    double sum = 0;
+    for (int i = 0; i < nbONode; ++i) {
+            sum += get[i];
+    }
+
+    for (int i = 0; i < a.array[a.length-1]->length; ++i) {
+
+        a.array[a.length-1]->array[i]->value = 0;//qqchose
+
+        for (long j = 0; j < a.array[a.length-1]->array[i]->weight_length; ++j) {
+            a.array[a.length-1]->array[i]->weight[j] = 0; //qqchose
+        }
+
+        a.array[a.length-1]->array[i]->bias = 0;//qqchose
+    }
+
+    //Hidden Layer -- même chose que ci dessus
+
+
+}
 
 void shuffle(){}
 
-neuron neuron_init(long nb_weight){
+neuron* neuron_init(long nb_weight){
     neuron* a = malloc(sizeof(neuron));
     a->value = 0;
     a->bias = 1;//Random--------------------------------------------------
@@ -115,17 +160,17 @@ neuron neuron_init(long nb_weight){
     for(int k = 0; k < nb_weight; k++) {
         a->weight[k] = 1;//Random--------------------------------------------------
     }
-    return *a;
+    return a;
 }
 
-layer layer_init(long nb_neuron, long nb_weight){
+layer* layer_init(long nb_neuron, long nb_weight){
     layer* a = malloc(sizeof(layer));
     a->length = nb_neuron;
     a->array = malloc(sizeof(neuron) * nb_neuron);
     for (int i = 0; i < nb_neuron; i++) {
         a->array[i] = neuron_init(nb_weight);
     }
-    return *a;
+    return a;
 }
 
 network initialisation(){
