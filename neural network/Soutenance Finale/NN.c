@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #define nbInput 28*28
 
@@ -12,9 +13,11 @@
 #define nbHNode 16
 #define nbONode 10
 
-#define MAX(x,y) ((x)>(y)?(x):(y))
+int randomizer(){
+    return ((double)rand())/((double)RAND_MAX);
+}
 
-double getmax1(layer* a) {
+double getmax(layer* a) {
     double max = a->array[0]->value;
     for (long i = 0; i < a->length; i++) {
         max = a->array[i]->value > max ? a->array[i]->value : max;
@@ -22,16 +25,8 @@ double getmax1(layer* a) {
     return max;
 }
 
-double getmax2(double* a, int len) {
-    double max = a[0];
-    for (int i = 0; i < len; i++) {
-        max = a[i] > max ? a[i] : max;
-    }
-    return max;
-}
-
 double LeakyReLU(double z, double alpha){
-    return MAX(alpha * z, z);
+    return alpha * z > z ? alpha * z : z;
 }
 
 double Z1(neuron neurone, neuron* input){
@@ -58,40 +53,30 @@ void dsLeakyReLU(neuron *neuron, double z, double alpha) {
     neuron->value = z > 0 ? 1 : alpha;
 }
 
-void softmax(layer* input){
+double softmax(double value, double sum){
+    return exp(value) / sum;
+}
 
-    //sum
-    double sum = 0;
-    for (long i = 0; i < input->length; ++i) {
-        sum = exp(input->array[i]->value);
-    }
+//Result array of softmax function and indice of the current calc value from softmax too
+double dssoftmax(double* a, long i, long j, double sum){
 
-    for (long i = 0; i < input->length; ++i) {
-        input->array[i]->value = exp(input->array[i]->value) / sum;
-    }
+    if(i == j)
+        return a[i] * (1 - a[j]);
+    else
+        return -a[i], sum * a[j];
+
 }
 
 //Log Loss cost function
-double cost(network* get, double* expected){
+double cost(double* get, double* expected){
     double res = 0;
     for (int i = 0; i < nbONode; ++i) {
-        res += get[i] * log(expected[i]) + (1 - get[i]) * log(1 - expected[i]);
+        res += get[i] * log(expected[i])
+                + (1 - get[i]) * log(1 - expected[i]);
     }
     res *= (1./nbONode);
     return res;
 }
-
-double dssoftmax(double* array, int indice, double sum){ //result array of softmax function and indice of the current calc value from softmax too
-
-    double partial_sum = 0;
-    for (int i = 0; i < nbONode; ++i) {
-        if(i != indice)
-            partial_sum += array[i];
-    }
-
-    return (array[indice] * partial_sum) / pow(sum, 2);
-}
-
 
 double forwardpass(network a, double* input, double learning_rate){
 
@@ -108,14 +93,32 @@ double forwardpass(network a, double* input, double learning_rate){
     }
 
     //Output Layer
-    softmax(a.array[a.length-1]);
 
-    return getmax1(a.array[a.length-1]);
+    //sum for softmax
+    double sum = 0;
+    for (long i = 0; i < a.array[a.length-1]->length; ++i) {
+        sum = exp(a.array[a.length-1]->array[i]->value);
+    }
+
+    for (long i = 0; i < a.array[i]->length; ++i) {
+        a.array[a.length - 1]->array[i]->value = softmax(a.array[a.length - 1]->array[i]->value, sum);
+    }
+
+    return getmax(a.array[a.length-1]);
 }
 
 void backwardpass(network a, double* get, double* expected){
 
     //Output Layer
+
+    //Sum of value
+    double sum = 0;
+
+    for (int i = 0; i < nbONode; ++i) {
+        sum += get[i];
+    }
+
+    //Qqchose avec error et dssoftmax
 
     for (int i = 0; i < a.array[a.length-1]->length; ++i) {
 
@@ -128,36 +131,71 @@ void backwardpass(network a, double* get, double* expected){
         a.array[a.length-1]->array[i]->bias = 0;//qqchose
     }
 
-    //Hidden Layer -- même chose que ci dessus
+    //Hidden Layer
+    for (int i = a.length-2; i > -1; ++i) {
+        for (int j = 0; j < a.array[i]->length; ++j) {
+            a.array[i]->array[j]->value = 0;//qqchose
 
+            for (long k = 0; j < a.array[i]->array[j]->weight_length; ++j) {
+                a.array[i]->array[j]->weight[k] = 0; //qqchose
+            }
 
-}
-
-void training(network* network, long epoch, double learning_rate){
-
-    for (long i = 0; i < epoch; ++i) {
-
-        //Choose the input
-
-        //Forward
-        forwardpass(network, , learning_rate);
-
-        double error = cost(network,expected);
-
+            a.array[i]->array[j]->bias = 0;//qqchose
+        }
     }
 
 }
 
-void shuffle(){}
+void training(network* network, double*** input, long epoch, double learning_rate){
+
+    double** expected[10][10] = {
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+                                 };
+
+    for (long i = 0; i < epoch; ++i) {
+
+        //Choose the input
+        int indexe = rand() % 10; // Sélection de la valeur
+        int indexe2 = rand() % 10; // Sélection de la valeur dans la liste des représentations possibles
+
+        //Forward
+        double res = forwardpass(*network, input[indexe][indexe2], learning_rate);
+
+        //Get result softmax int tmp array
+        double tmp[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        for (int j = 0; j < nbONode; ++j) {
+            tmp[i] = network->array[network->length - 1]->array[i]->value;
+        }
+
+        //Calc error
+        double error = cost(tmp, (double *) expected[indexe]);
+        printf("Enter: %d      Get: %f       The margin of error: %f\n", ((indexe + 1) % 10), res, (1 - error * 100));
+
+        //Backward
+        backwardpass(*network, tmp, (double *)expected[indexe]);
+    }
+
+}
+
+
 
 neuron* neuron_init(long nb_weight){
     neuron* a = malloc(sizeof(neuron));
     a->value = 0;
-    a->bias = 1;//Random--------------------------------------------------
+    a->bias = randomizer();
     a->weight_length = nb_weight;
     a->weight = malloc(sizeof(double) * nb_weight);
     for(int k = 0; k < nb_weight; k++) {
-        a->weight[k] = 1;//Random--------------------------------------------------
+        a->weight[k] = randomizer();
     }
     return a;
 }
@@ -206,10 +244,26 @@ network initialisation(){
     return *a;
 }
 
-int main(){
+void free_network(network* a){}
+
+
+int main(int argc, char **argv){
 
     const double learning_rate = 0.1f;
     network a = initialisation();
+
+    if(strcmp(argv[1], "-t") == 0){ // Check if test mode
+        double*** input; // Init training image
+        training(&a, input, 100, 0.01);
+        // Save the training
+    }
+    else {
+        double* input; // Get image
+        double res = forwardpass(a, input, 0.01);
+        printf("Result: %f", res);
+    }
+
+    free_network(&a);
 
     return 0;
 }
