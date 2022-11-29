@@ -78,6 +78,10 @@ double cost(double* get, double* expected){
     return res;
 }
 
+void dscost(){
+
+}
+
 double forwardpass(network a, double* input, double learning_rate){
 
     //Input Layer
@@ -107,7 +111,7 @@ double forwardpass(network a, double* input, double learning_rate){
     return getmax(a.array[a.length-1]);
 }
 
-void backwardpass(network a, double* get, double* expected){
+void backwardpass(network a, double* get, double* expected, double cost, double learning_rate){
 
     //Output Layer
 
@@ -131,16 +135,30 @@ void backwardpass(network a, double* get, double* expected){
         a.array[a.length-1]->array[i]->bias = 0;//qqchose
     }
 
+    double* tmp;
+
     //Hidden Layer
     for (int i = a.length-2; i > -1; ++i) {
+
+        // Compute change in hidden weights
+        double deltaHidden[a.array[i]->length];
+        for (int j=0; j < a.array[i]->length; j++) {
+            double errorHidden = 0.0f;
+            for(int k=0; k < a.array[i+1]->length; k++) {
+                errorHidden += tmp[k] * a.array[i+1]->array[k]->weight[j];
+            }
+            deltaHidden[j] = errorHidden * dsLeakyReLU(a.array[i]->array[j], ? ,0.01);
+        }
+
+        //Apply change
         for (int j = 0; j < a.array[i]->length; ++j) {
-            a.array[i]->array[j]->value = 0;//qqchose
+            //a.array[i]->array[j]->value = deltaHidden[j] * learning_rate;//qqchose
 
             for (long k = 0; j < a.array[i]->array[j]->weight_length; ++j) {
-                a.array[i]->array[j]->weight[k] = 0; //qqchose
+                a.array[i]->array[j]->weight[k] = deltaHidden[j] * learning_rate; //?
             }
 
-            a.array[i]->array[j]->bias = 0;//qqchose
+            a.array[i]->array[j]->bias = deltaHidden[j] * learning_rate;//qqchose
         }
     }
 
