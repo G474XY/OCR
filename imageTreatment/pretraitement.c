@@ -1,7 +1,7 @@
 #include <err.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-
+#include <math.h>
 // Converts a colored pixel into grayscale.
 //
 // pixel_color: Color of the pixel to convert in the RGB format.
@@ -18,7 +18,7 @@ Uint32 pixel_to_grayscale(Uint32 pixel_color, SDL_PixelFormat* format)
     r = average;
     g = average;
     b = average;
-    
+
     color = SDL_MapRGB(format, r, g, b);
     return color;
 }
@@ -34,15 +34,70 @@ void surface_to_grayscale(SDL_Surface* surface)
     SDL_UnlockSurface(surface);
 }
 
+float luminosity(Uint8 c, double n)
+{
+    return (Uint8) (255 * SDL_pow((double) c / 255, n));
+}
+
+void change_luminosity(SDL_Surface* surface)
+{
+    Uint32* pixels = surface->pixels;
+    int h = surface->h;
+    int w = surface->w;
+    double n = 0.5;
+    for(int i = 0; i < h; i++)
+    {
+        for(int j = 0; j < w; j++)
+        {
+            Uint8 r, g, b;
+            SDL_PixelFormat* format = surface->format;
+            SDL_GetRGB(pixels[i*w+j], surface->format, &r, &g, &b);
+            r = luminosity(r, n);
+            g = luminosity(g, n);
+            b = luminosity(b, n);
+            pixels[i*(w)+j] = SDL_MapRGB(format, r, g, b);
+        }
+    }
+}
+
+Uint8 contrast(Uint8 c, double n)
+{
+    if(c <= 255 / 2)
+        return (Uint8)( (255/2) * SDL_pow((double) 2 * c / 255, n));
+    else
+        return 255 - contrast(255 - c, n);
+}
+
+void change_contrast(SDL_Surface* surface)
+{
+    Uint32* pixels = surface->pixels;
+    int h = surface->h;
+    int w = surface->w;
+    double n = 0.6;
+    for(int i = 0; i < h; i++)
+    {
+        for(int j = 0; j < w; j++)
+        {
+            Uint8 r, g, b;
+            SDL_PixelFormat* format = surface->format;
+            SDL_GetRGB(pixels[i*w+j], format, &r, &g, &b);
+            r = contrast(r, n);
+            g = contrast(g, n);
+            b = contrast(b, n);
+            pixels[i*(w)+j] = SDL_MapRGB(format, r, g, b);
+        }
+    }
+}
+
 //moyenne d'un pixel avec ces voisins pour le flou gaussien
 Uint32 moyenne(SDL_Surface *surface, int i, int j, int n)
 {
-    const int initial_h = SDL_max(i - n, 0);
-    const int initial_w = SDL_max(j - n, 0);
-    const int final_h = SDL_min(i + n, surface->h - 1);
-    const int final_w = SDL_min(j + n, surface->w - 1);
-    const int nb_pixel = ((final_h - initial_h) * (final_w - initial_w));
-    const Uint32 *p = surface->pixels;
+    int initial_h = SDL_max(i - n, 0);
+    int initial_w = SDL_max(j - n, 0);
+    int final_h = SDL_min(i + n, surface->h - 1);
+    int final_w = SDL_min(j + n, surface->w - 1);
+    int nb_pixel = ((final_h - initial_h) * (final_w - initial_w));
+    Uint32 *p = surface->pixels;
 
     Uint32 sum_r = 0, sum_g = 0, sum_b = 0;
     SDL_Color color;
@@ -66,9 +121,9 @@ void flou_gaussien(SDL_Surface* surface)
     int w = surface->w;
     for(int i = 0; i < h; i++)
     {
-    for(int j = 0; j < w; j++)
+        for(int j = 0; j < w; j++)
         {
-            pixels[i * w + j] = moyenne(surface, i, j, 2);
+            pixels[i * w + j] = moyenne(surface, i, j, 3);
         }
     }
 }
@@ -179,7 +234,6 @@ void binarization(SDL_Surface* surface, int n)
     SDL_UnlockSurface(surface);
 }
 
-
 void white_to_black(SDL_Surface* surface)
 {
     SDL_PixelFormat* format = surface->format;
@@ -213,6 +267,72 @@ void white_to_black(SDL_Surface* surface)
                 b = 255 - b;
                 pixels[k*w+l] = SDL_MapRGB(format,r,g,b);
             }
+        }
+    }
+}
+
+double convolution(SDL_Surface * s, double kernel[3][3], int row, int col)
+{
+    double sum = 0;
+    int w = s->w;
+    int h = s->h;
+    Uint8 r,g,b;
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            int x = i + row;
+            int y = j + col;
+            if (x >= 0 && y >= 0 && x < w && y < h)
+            {
+                Uint32* pixels = s->pixels;
+                SDL_GetRGB(pixels[y*w+x], s->format, &r,&g,&b);
+                sum += r * kernel[i][j];
+            }
+        }
+    }
+    return sum;
+}
+
+
+void sobel(SDL_Surface* surface)
+{
+    double gx, gy;
+    double g_px;
+
+    double kernel_x[3][3] = { { -1.0, 0.0, 1.0 },
+                              { -2.0, 0.0, 2.0 },
+                              { -1.0, 0.0, 1.0 } };
+
+    double kernel_y[3][3] = { { -1.0, -2.0, -1.0 },
+                              { 0.0, 0.0, 0.0 },
+                              { 1.0, 2.0, 1.0 } };
+
+    int h = surface->h;
+    int w = surface->w;
+    for (int i = 0; i < h; i++)
+    {
+        for (int j = 0; j < w; j++)
+        {
+            gx = convolution(surface, kernel_x, j, i);
+            gy = convolution(surface, kernel_y, j, i);
+            g_px = sqrt(gx * gx + gy * gy);
+            Uint8 r,g,b;
+            Uint32* pixels = surface->pixels;
+            SDL_GetRGB(pixels[i*w+j], surface->format, &r,&g,&b);
+            if ((unsigned int)g_px > 128)
+            {
+                r = 255;
+                g = 255;
+                b = 255;
+            }
+            else
+            {
+                r = 0;
+                g = 0;
+                b = 0;
+            }
+            pixels[i*w+j] = SDL_MapRGB(surface->format,r,g,b);
         }
     }
 }
