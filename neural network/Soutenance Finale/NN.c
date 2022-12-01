@@ -71,7 +71,7 @@ double* cost(double* get, double* expected){
                 + (1 - get[i]) * log(1 - expected[i]));
     }
 
-    return res;
+    return &res;
 }
 
 double average(double* a){
@@ -122,7 +122,7 @@ double forwardpass(network a, double* input, double learning_rate){
     return getmax(a.array[a.length-1]);
 }
 
-void backwardpass(network a, double* get, double* expected, double* cost, double learning_rate){
+void backwardpass(network a, double* get, double* expected, double* input, double* cost, double learning_rate){
     
     //Sum of value
     double sum = 0;
@@ -153,16 +153,21 @@ void backwardpass(network a, double* get, double* expected, double* cost, double
 
     //Hidden Layer
 
+    double *E = cost;
+
     for (int i = a.length - 2; i > 0; i--) {
 
         //Compute dW, dB and apply change
-        double* E = malloc(a.array[i]->length);
+        double* tmp = malloc(a.array[i]->length);
 
         for (int j = 0; j < a.array[i]->length; ++j) {
-            for (int k = 0; k < a.array[i+1]->length; ++k) {
-                E[j] += cost[k] * a.array[i+1]->array[k]->value * a.array[i+1]->array[k]->weight[j];
+            for (int k = 0; k < a.array[i+1]->length; ++k) { // conflit de tableau d'erreur
+                tmp[j] += E[k] * a.array[i+1]->array[k]->value * a.array[i+1]->array[k]->weight[j];
             }
         }
+
+        free(E);
+        E = tmp;
 
         //Apply change
         for (int j = 0; j <  a.array[i]->length; j++) {
@@ -174,18 +179,39 @@ void backwardpass(network a, double* get, double* expected, double* cost, double
                         (dsLeakyReLU(a.array[i]->array[j]->value, 0.01) * E[j] * a.array[i - 1]->array[j]->value);
             }
         }
-
     }
 
     //Input Layer
 
+    //Compute dW, dB and apply change
+    double* tmp = malloc(a.array[0]->length);
 
+    for (int j = 0; j < a.array[0]->length; ++j) {
+        for (int k = 0; k < a.array[1]->length; ++k) { // conflit de tableau d'erreur
+            tmp[j] += E[k] * a.array[1]->array[k]->value * a.array[1]->array[k]->weight[j];
+        }
+    }
 
+    free(E);
+    E = tmp;
+
+    //Apply change
+    for (int j = 0; j <  a.array[0]->length; j++) {
+
+        a.array[0]->array[j]->bias -= learning_rate * dsLeakyReLU(a.array[0]->array[j]->value, 0.01) * E[j];
+
+        for(int k = 0; k < a.array[0]->array[j]->weight_length; k++) {
+            a.array[0]->array[j]->weight[k] -= learning_rate *
+                                               (dsLeakyReLU(a.array[0]->array[j]->value, 0.01) * E[j] * input[k]);
+        }
+    }
+
+    free(E);
 }
 
 void training(network* network, double*** input, long epoch, double learning_rate){
 
-    double** expected[10][10] = {
+    double expected[10][10] = {
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
@@ -216,10 +242,10 @@ void training(network* network, double*** input, long epoch, double learning_rat
         //Calc error
         double* c = cost(tmp, (double *) expected[indexe]);
         double error = average(c);
-        printf("Enter: %d      Get: %f       The margin of error: %f\n", ((indexe + 1) % 10), res, (1 - error * 100));
+        printf("Enter: %d      Get: %f       The margin of error: %f\n", ((indexe + 1) % 10), res, error);
 
         //Backward
-        backwardpass(*network, tmp, (double *)expected[indexe], error, learning_rate);
+        backwardpass(*network, tmp, (double *)expected[indexe], input[indexe][indexe2], c, learning_rate);
     }
 
 }
@@ -282,7 +308,27 @@ network initialisation(){
     return *a;
 }
 
-void free_network(network* a){}
+
+void free_neuron(neuron* n){
+    free(n->weight);
+    free(n);
+}
+
+void free_layer(layer* l){
+    for (int i = 0; i < l->length; i++) {
+        free_neuron(l->array[i]);
+    }
+    free(l->array);
+    free(l);
+}
+
+void free_network(network* a){
+    for (int i = 0; i < a->length; i++) {
+        free_layer(a->array[i]);
+    }
+    free(a->array);
+    free(a);
+}
 
 
 int main(int argc, char **argv){
