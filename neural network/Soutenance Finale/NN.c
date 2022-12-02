@@ -71,7 +71,7 @@ double* cost(double* get, double* expected){
                 + (1 - get[i]) * log(1 - expected[i]));
     }
 
-    return &res;
+    return res;
 }
 
 double average(double* a){
@@ -122,7 +122,7 @@ double forwardpass(network a, double* input, double learning_rate){
     return getmax(a.array[a.length-1]);
 }
 
-void backwardpass(network a, double* get, double* expected, double* input, double* cost, double learning_rate){
+void backwardpass(network a, double* get, double* input, double* cost, double learning_rate){
     
     //Sum of value
     double sum = 0;
@@ -209,43 +209,35 @@ void backwardpass(network a, double* get, double* expected, double* input, doubl
     free(E);
 }
 
-void training(network* network, double*** input, long epoch, double learning_rate){
-
-    double expected[10][10] = {
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
-                                 };
+void training(network* network, training_image input, long epoch, double learning_rate){
 
     for (long i = 0; i < epoch; ++i) {
 
-        //Choose the input
-        int indexe = rand() % 10; // Sélection de la valeur
-        int indexe2 = rand() % 10; // Sélection de la valeur dans la liste des représentations possibles
+        for (int j = 0; j < input.nb_images; ++j) {
 
-        //Forward
-        double res = forwardpass(*network, input[indexe][indexe2], learning_rate);
+            //Forward
+            double res = forwardpass(*network, input.images[j], learning_rate);
 
-        //Get result softmax int tmp array
-        double tmp[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        for (int j = 0; j < nbONode; ++j) {
-            tmp[i] = network->array[network->length - 1]->array[i]->value;
+            //Get result softmax int tmp array
+            double tmp[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            for (int k = 0; k < nbONode; ++k) {
+                tmp[k] = network->array[network->length - 1]->array[k]->value;
+            }
+
+            //Calc value
+            double expected[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            expected[j%10] = 1;
+
+            //Calc error
+            double* c = cost(tmp, (double *) expected);
+            double error = average(c);
+            printf("Enter: %d      Get: %f       The margin of error: %f\n", input.labels[j], res, error);
+
+            //Backward
+            backwardpass(*network, tmp, input.images[j], c, learning_rate);
+
         }
 
-        //Calc error
-        double* c = cost(tmp, (double *) expected[indexe]);
-        double error = average(c);
-        printf("Enter: %d      Get: %f       The margin of error: %f\n", ((indexe + 1) % 10), res, error);
-
-        //Backward
-        backwardpass(*network, tmp, (double *)expected[indexe], input[indexe][indexe2], c, learning_rate);
     }
 
 }
@@ -337,9 +329,10 @@ int main(int argc, char **argv){
     network a = initialisation();
 
     if(strcmp(argv[1], "-t") == 0){ // Check if test mode
-        double*** input; // Init training image
-        training(&a, input, 100, 0.01);
-        // Save the training
+        training_image* input = SetupTrainingArrays();
+        training(&a, *input, 1000, 0.01);
+        FreeTrainingArrays(input);
+
     }
     else {
         double* input; // Get image

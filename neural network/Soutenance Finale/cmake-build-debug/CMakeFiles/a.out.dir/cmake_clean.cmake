@@ -1,6 +1,10 @@
 file(REMOVE_RECURSE
   "CMakeFiles/a.out.dir/NN.c.obj"
   "CMakeFiles/a.out.dir/NN.c.obj.d"
+  "CMakeFiles/a.out.dir/NNsave.c.obj"
+  "CMakeFiles/a.out.dir/NNsave.c.obj.d"
+  "CMakeFiles/a.out.dir/NNtraining.c.obj"
+  "CMakeFiles/a.out.dir/NNtraining.c.obj.d"
   "a.out.exe"
   "a.out.exe.manifest"
   "a.out.pdb"

@@ -47,19 +47,19 @@ cmake_force:
 SHELL = cmd.exe
 
 # The CMake executable.
-CMAKE_COMMAND = C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\223.7571.171\bin\cmake\win\bin\cmake.exe
+CMAKE_COMMAND = "C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe"
 
 # The command to remove a file.
-RM = C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\223.7571.171\bin\cmake\win\bin\cmake.exe -E rm -f
+RM = "C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale"
+CMAKE_SOURCE_DIR = "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\cmake-build-debug"
+CMAKE_BINARY_DIR = "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -67,7 +67,7 @@ CMAKE_BINARY_DIR = "C:\Users\virtu\Documents\GitHub\neural network\soutenance Fi
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\223.7571.171\bin\cmake\win\bin\cmake.exe -E echo "No interactive CMake dialog available."
+	"C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe" -E echo "No interactive CMake dialog available."
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -77,7 +77,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\223.7571.171\bin\cmake\win\bin\cmake.exe --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	"C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe" --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -86,9 +86,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\cmake-build-debug\CMakeFiles" "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\cmake-build-debug\\CMakeFiles\progress.marks"
+	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug\CMakeFiles" "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug\\CMakeFiles\progress.marks"
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\cmake-build-debug\CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug\CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
@@ -152,6 +152,54 @@ NN.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\a.out.dir\build.make CMakeFiles/a.out.dir/NN.c.s
 .PHONY : NN.c.s
 
+NNsave.obj: NNsave.c.obj
+.PHONY : NNsave.obj
+
+# target to build an object file
+NNsave.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\a.out.dir\build.make CMakeFiles/a.out.dir/NNsave.c.obj
+.PHONY : NNsave.c.obj
+
+NNsave.i: NNsave.c.i
+.PHONY : NNsave.i
+
+# target to preprocess a source file
+NNsave.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\a.out.dir\build.make CMakeFiles/a.out.dir/NNsave.c.i
+.PHONY : NNsave.c.i
+
+NNsave.s: NNsave.c.s
+.PHONY : NNsave.s
+
+# target to generate assembly for a file
+NNsave.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\a.out.dir\build.make CMakeFiles/a.out.dir/NNsave.c.s
+.PHONY : NNsave.c.s
+
+NNtraining.obj: NNtraining.c.obj
+.PHONY : NNtraining.obj
+
+# target to build an object file
+NNtraining.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\a.out.dir\build.make CMakeFiles/a.out.dir/NNtraining.c.obj
+.PHONY : NNtraining.c.obj
+
+NNtraining.i: NNtraining.c.i
+.PHONY : NNtraining.i
+
+# target to preprocess a source file
+NNtraining.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\a.out.dir\build.make CMakeFiles/a.out.dir/NNtraining.c.i
+.PHONY : NNtraining.c.i
+
+NNtraining.s: NNtraining.c.s
+.PHONY : NNtraining.s
+
+# target to generate assembly for a file
+NNtraining.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\a.out.dir\build.make CMakeFiles/a.out.dir/NNtraining.c.s
+.PHONY : NNtraining.c.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -164,6 +212,12 @@ help:
 	@echo ... NN.obj
 	@echo ... NN.i
 	@echo ... NN.s
+	@echo ... NNsave.obj
+	@echo ... NNsave.i
+	@echo ... NNsave.s
+	@echo ... NNtraining.obj
+	@echo ... NNtraining.i
+	@echo ... NNtraining.s
 .PHONY : help
 
 

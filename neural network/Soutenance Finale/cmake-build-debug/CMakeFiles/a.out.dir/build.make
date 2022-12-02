@@ -43,19 +43,19 @@ cmake_force:
 SHELL = cmd.exe
 
 # The CMake executable.
-CMAKE_COMMAND = C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\223.7571.171\bin\cmake\win\bin\cmake.exe
+CMAKE_COMMAND = "C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe"
 
 # The command to remove a file.
-RM = C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\223.7571.171\bin\cmake\win\bin\cmake.exe -E rm -f
+RM = "C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale"
+CMAKE_SOURCE_DIR = "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\cmake-build-debug"
+CMAKE_BINARY_DIR = "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug"
 
 # Include any dependencies generated for this target.
 include CMakeFiles/a.out.dir/depend.make
@@ -69,32 +69,64 @@ include CMakeFiles/a.out.dir/progress.make
 include CMakeFiles/a.out.dir/flags.make
 
 CMakeFiles/a.out.dir/NN.c.obj: CMakeFiles/a.out.dir/flags.make
-CMakeFiles/a.out.dir/NN.c.obj: C:/Users/virtu/Documents/GitHub/neural\ network/soutenance\ Finale/NN.c
+CMakeFiles/a.out.dir/NN.c.obj: C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/NN.c
 CMakeFiles/a.out.dir/NN.c.obj: CMakeFiles/a.out.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/a.out.dir/NN.c.obj"
-	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\223.7571.171\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/a.out.dir/NN.c.obj -MF CMakeFiles\a.out.dir\NN.c.obj.d -o CMakeFiles\a.out.dir\NN.c.obj -c "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\NN.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/a.out.dir/NN.c.obj"
+	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/a.out.dir/NN.c.obj -MF CMakeFiles\a.out.dir\NN.c.obj.d -o CMakeFiles\a.out.dir\NN.c.obj -c "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\NN.c"
 
 CMakeFiles/a.out.dir/NN.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/a.out.dir/NN.c.i"
-	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\223.7571.171\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\NN.c" > CMakeFiles\a.out.dir\NN.c.i
+	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\NN.c" > CMakeFiles\a.out.dir\NN.c.i
 
 CMakeFiles/a.out.dir/NN.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/a.out.dir/NN.c.s"
-	C:\Users\virtu\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\223.7571.171\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\NN.c" -o CMakeFiles\a.out.dir\NN.c.s
+	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\NN.c" -o CMakeFiles\a.out.dir\NN.c.s
+
+CMakeFiles/a.out.dir/NNsave.c.obj: CMakeFiles/a.out.dir/flags.make
+CMakeFiles/a.out.dir/NNsave.c.obj: C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/NNsave.c
+CMakeFiles/a.out.dir/NNsave.c.obj: CMakeFiles/a.out.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/a.out.dir/NNsave.c.obj"
+	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/a.out.dir/NNsave.c.obj -MF CMakeFiles\a.out.dir\NNsave.c.obj.d -o CMakeFiles\a.out.dir\NNsave.c.obj -c "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\NNsave.c"
+
+CMakeFiles/a.out.dir/NNsave.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/a.out.dir/NNsave.c.i"
+	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\NNsave.c" > CMakeFiles\a.out.dir\NNsave.c.i
+
+CMakeFiles/a.out.dir/NNsave.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/a.out.dir/NNsave.c.s"
+	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\NNsave.c" -o CMakeFiles\a.out.dir\NNsave.c.s
+
+CMakeFiles/a.out.dir/NNtraining.c.obj: CMakeFiles/a.out.dir/flags.make
+CMakeFiles/a.out.dir/NNtraining.c.obj: C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/NNtraining.c
+CMakeFiles/a.out.dir/NNtraining.c.obj: CMakeFiles/a.out.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/a.out.dir/NNtraining.c.obj"
+	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/a.out.dir/NNtraining.c.obj -MF CMakeFiles\a.out.dir\NNtraining.c.obj.d -o CMakeFiles\a.out.dir\NNtraining.c.obj -c "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\NNtraining.c"
+
+CMakeFiles/a.out.dir/NNtraining.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/a.out.dir/NNtraining.c.i"
+	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\NNtraining.c" > CMakeFiles\a.out.dir\NNtraining.c.i
+
+CMakeFiles/a.out.dir/NNtraining.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/a.out.dir/NNtraining.c.s"
+	C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\NNtraining.c" -o CMakeFiles\a.out.dir\NNtraining.c.s
 
 # Object files for target a.out
 a_out_OBJECTS = \
-"CMakeFiles/a.out.dir/NN.c.obj"
+"CMakeFiles/a.out.dir/NN.c.obj" \
+"CMakeFiles/a.out.dir/NNsave.c.obj" \
+"CMakeFiles/a.out.dir/NNtraining.c.obj"
 
 # External object files for target a.out
 a_out_EXTERNAL_OBJECTS =
 
 a.out.exe: CMakeFiles/a.out.dir/NN.c.obj
+a.out.exe: CMakeFiles/a.out.dir/NNsave.c.obj
+a.out.exe: CMakeFiles/a.out.dir/NNtraining.c.obj
 a.out.exe: CMakeFiles/a.out.dir/build.make
 a.out.exe: CMakeFiles/a.out.dir/linklibs.rsp
 a.out.exe: CMakeFiles/a.out.dir/objects1.rsp
 a.out.exe: CMakeFiles/a.out.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable a.out.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable a.out.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\a.out.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -106,6 +138,6 @@ CMakeFiles/a.out.dir/clean:
 .PHONY : CMakeFiles/a.out.dir/clean
 
 CMakeFiles/a.out.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale" "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale" "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\cmake-build-debug" "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\cmake-build-debug" "C:\Users\virtu\Documents\GitHub\neural network\soutenance Finale\cmake-build-debug\CMakeFiles\a.out.dir\DependInfo.cmake" --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale" "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale" "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug" "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug" "C:\Users\virtu\Documents\GitHub\neural network\Soutenance Finale\cmake-build-debug\CMakeFiles\a.out.dir\DependInfo.cmake" --color=$(COLOR)
 .PHONY : CMakeFiles/a.out.dir/depend
 
