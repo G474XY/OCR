@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include "NN.h"
 
+//===============CONSTANTS================
+const char* save_path = "save/Network.nn";
+//========================================
+
 void print_array(double* arr,size_t size)
 {
     printf("[ ");
@@ -233,21 +237,19 @@ void save_network(network* net,FILE* file)
 
 //========================================
 
-/*int main()
-{
-    FILE* file = fopen("save_tests/network.txt","r");
-    network* n = load_network(file);
-    if(n == NULL)
-        printf("Error while loading neunetworkron\n");
-    else
-    {
-        print_network(n);
-        fclose(file);
-        file = fopen("save_tests/network_save.txt","w");
-        save_network(n,file);
-        fclose(file);
-        free_network(n);
-    }
+//===============FUNCTIONS================
 
-    return 0;
-}*/
+network* load_network()
+{
+    FILE* file = fopen(save_path,"r");
+    network* net = load_network(file);
+    fclose(file);
+    return net;
+}
+
+void save_network(network* net)
+{
+    FILE *file = fopen(save_path,"w");
+    save_network(net,file);
+    fclose(file);
+}
