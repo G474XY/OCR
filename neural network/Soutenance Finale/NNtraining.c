@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "allocfree.h"
+#include "NNtraining.h"
 
 //==========CONSTANTS==========
 
@@ -15,8 +16,7 @@ const size_t uns_char_size = sizeof(unsigned char);
 //=======GLOBAL VARIABLES======
 //FILE* file = NULL; //Le fichier des images
 //FILE* l_file = NULL; //Le fichier des labels y étant associés
-double** images = NULL;
-char* labels = NULL;
+
 unsigned char buff[6]; //Le buffer de lecture
 //double** img = NULL; //L'array à 2 dimensions représentant l'image
 //int num_images = 0;
@@ -195,31 +195,25 @@ double* GetNextImage(FILE* file,FILE* l_file,char* label)
 
 //=============================
 
-//=======Transformations=======
-
-void translate_img(double* img,int tx,int ty)
-{
-
-}
-
 //=============================
 
-void FreeTrainingArrays()
+void FreeTrainingArrays(training* training)
 {
-    if(images != NULL)
-        _freeArrayArray(images,num_images);
-    if(labels != NULL)
-        free(labels);
+    if(training->images != NULL)
+        _freeArrayArray(training->images,num_images);
+    if(training->labels != NULL)
+        free(training->labels);
+    free(training);
 }
 
-char SetupTrainingArrays(double*** images,char** labels)
+training* SetupTrainingArrays()
 {
     FILE* file = NULL;
     FILE* l_file = NULL;
     if(file_init(&file,&l_file))
-        return 1;
-    *images = malloc(num_images * sizeof(double*));
-    *labels = calloc(num_images,sizeof(char));
+        return NULL;
+    double** images = malloc(num_images * sizeof(double*));
+    char* labels = calloc(num_images,sizeof(char));
     double* img = NULL;
     char label = 0;
     for(size_t i = 0; i < num_images; i++)
@@ -227,14 +221,20 @@ char SetupTrainingArrays(double*** images,char** labels)
         img = GetNextImage(file,l_file,&label);
         if(img == NULL)
             break;
-        (*images)[i] = img;
-        (*labels)[i] = label;
+        images[i] = img;
+        labels[i] = label;
     }   
 
     fclose(file);
     fclose(l_file);
 
-    return 0;
+    training* training = malloc(sizeof(training));
+    training->nb_images = num_images;
+    training->im_size = img_size;
+    training->images = images;
+    training->labels = labels;
+
+    return training;
 }
 
 //==========TEST MAIN==========
@@ -256,10 +256,8 @@ char SetupTrainingArrays(double*** images,char** labels)
 }*/
 int main()
 {
-    double*** imgs = malloc(sizeof(double**));
-    char** labls = malloc(sizeof(char*));
-    SetupTrainingArrays(imgs,labls);
-    FreeTrainingArrays();
+    training* t = SetupTrainingArrays();
+    FreeTrainingArrays(t);
     return 0;
 }
 //=============================

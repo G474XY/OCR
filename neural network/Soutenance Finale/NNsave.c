@@ -3,7 +3,7 @@
 #include "NN.h"
 
 //===============CONSTANTS================
-const char* save_path = "save/Network.nn";
+const char* save_path = "save/Network.txt";
 //========================================
 
 void print_array(double* arr,size_t size)
