@@ -118,7 +118,7 @@ double forwardpass(network a, double* input, double learning_rate){
         sum += exp(Z1(*a.array[a.length-1]->array[i], *a.array[a.length - 2]->array));
     }
 
-    for (long i = 0; i < a.array[i - 1]->length; ++i) {
+    for (long i = 0; i < a.array[a.length - 1]->length; ++i) {
         a.array[a.length - 1]->array[i]->value = softmax(Z1(*a.array[a.length-1]->array[i],
                                                             *a.array[a.length - 2]->array), sum);
     }
