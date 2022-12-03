@@ -9,7 +9,7 @@ const char* training_path = "training/testing.idx3-ubyte";
 const char* labels_path = "training/testing_labels.idx1-ubyte";
 #define img_size 28
 #define img_size_squared img_size * img_size
-#define  num_images 60000
+#define  num_images 5000
 const size_t uns_char_size = sizeof(unsigned char);
 //=============================
 
