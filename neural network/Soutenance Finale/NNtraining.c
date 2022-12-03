@@ -73,10 +73,10 @@ void translate_img(double** image,int x, int y)
     free(image_copy);
 }
 
-void cartesian_to_polar(int x, int y,double* r,double* theta)
+/*void cartesian_to_polar(int x, int y,double* r,double* theta)
 {
 
-}
+}*/
 
 //=============================
 
