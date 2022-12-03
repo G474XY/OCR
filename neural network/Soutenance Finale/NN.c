@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "NNtraining.h"
 #include "NNsave.h"
@@ -269,7 +270,7 @@ layer* layer_init(long nb_neuron, long nb_weight){
     return a;
 }
 
-network initialisation(){
+network* initialisation(){
 
     long nb_layer = nbILayer + nbHLayer + nbOLayer;
 
@@ -300,7 +301,7 @@ network initialisation(){
         n++;
     }
 
-    return *a;
+    return a;
 }
 
 
@@ -329,21 +330,26 @@ void free_network(network* a){
 int main(int argc, char **argv){
 
     const double learning_rate = 0.1f;
-    network a = initialisation();
-    if(argc >= 2 && strcmp(argv[1], "-t") == 0){ // Check if test mode
+    network* a;
+    if(!access( "save/XOR3.txt", F_OK))
+        a = initialisation();
+    else
+        a = LoadNetwork();
+
+    //if(strcmp(argv[1], "-t") == 0){ // Check if test mode
         training_image* input = SetupTrainingArrays();
-        training(&a, *input, 1000, 0.01);
-        //save weight
+        training(a, *input, 1000, 0.01);
+        SaveNetwork(a);
         FreeTrainingArrays(input);
 
-    }
-    else {
-        double* input; // Get image
-        double res = forwardpass(a, input, 0.01);
+    //}
+    /*else {
+        double* input = argv[]; // Get image
+        double res = forwardpass(*a, input, 0.01);
         printf("Result: %f", res);
-    }
+    }*/
 
-    free_network(&a);
+    free_network(a);
 
     return 0;
 }
