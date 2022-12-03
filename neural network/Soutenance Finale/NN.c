@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "NNtraining.h"
+#include "NNsave.h"
 
 #define nbInput 28*28
 
@@ -329,8 +330,7 @@ int main(int argc, char **argv){
 
     const double learning_rate = 0.1f;
     network a = initialisation();
-
-    if(strcmp(argv[1], "-t") == 0){ // Check if test mode
+    if(argc >= 2 && strcmp(argv[1], "-t") == 0){ // Check if test mode
         training_image* input = SetupTrainingArrays();
         training(&a, *input, 1000, 0.01);
         FreeTrainingArrays(input);

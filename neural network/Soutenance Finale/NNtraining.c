@@ -5,8 +5,8 @@
 
 //==========CONSTANTS==========
 
-const char* training_path = "training/training.idx3-ubyte";
-const char* labels_path = "training/training_labels.idx1-ubyte";
+const char* training_path = "training/testing.idx3-ubyte";
+const char* labels_path = "training/testing_labels.idx1-ubyte";
 #define img_size 28
 #define img_size_squared img_size * img_size
 #define  num_images 60000
@@ -228,7 +228,7 @@ training_image* SetupTrainingArrays()
     fclose(file);
     fclose(l_file);
 
-    training_image* training = malloc(sizeof(training));
+    training_image* training = malloc(sizeof(training_image));
     training->nb_images = num_images;
     training->im_size = img_size;
     training->images = images;
