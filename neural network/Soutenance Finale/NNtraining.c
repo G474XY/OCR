@@ -197,7 +197,7 @@ double* GetNextImage(FILE* file,FILE* l_file,char* label)
 
 //=============================
 
-void FreeTrainingArrays(training* training)
+void FreeTrainingArrays(training_image* training)
 {
     if(training->images != NULL)
         _freeArrayArray(training->images,num_images);
@@ -206,7 +206,7 @@ void FreeTrainingArrays(training* training)
     free(training);
 }
 
-training* SetupTrainingArrays()
+training_image* SetupTrainingArrays()
 {
     FILE* file = NULL;
     FILE* l_file = NULL;
@@ -228,7 +228,7 @@ training* SetupTrainingArrays()
     fclose(file);
     fclose(l_file);
 
-    training* training = malloc(sizeof(training));
+    training_image* training = malloc(sizeof(training));
     training->nb_images = num_images;
     training->im_size = img_size;
     training->images = images;
@@ -254,10 +254,10 @@ training* SetupTrainingArrays()
     }
     return 0;
 }*/
-int main()
+/*int main()
 {
-    training* t = SetupTrainingArrays();
+    training_image* t = SetupTrainingArrays();
     FreeTrainingArrays(t);
     return 0;
-}
+}*/
 //=============================

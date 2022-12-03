@@ -9,11 +9,11 @@ Returns the loaded network from the save file.
 NOTE : the save path is a constant defined in NNsave.c
 (We may have to change that in the future.)
 */
-network* load_network();
+network* LoadNetwork();
 
 /*
 Saves the network argument to the save file.
 */
-void save_network(network* net);
+void SaveNetwork(network* net);
 
 #endif

@@ -4,6 +4,8 @@
 #include <math.h>
 #include <string.h>
 
+#include "NNtraining.h"
+
 #define nbInput 28*28
 
 #define nbILayer 1

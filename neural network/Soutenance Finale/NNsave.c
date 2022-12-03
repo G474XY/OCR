@@ -36,27 +36,35 @@ void print_network(network* n)
         print_layer(n->array[i]);
 }
 
-void free_neuron(neuron* n)
+//========================================
+
+//=======FREE FUNCTIONS FOR LOADING=======
+
+void free_neuron_on_load(neuron* n)
 {
     free(n->weight);
     free(n);
 }
 
-void free_layer(layer* l)
+void free_layer_on_load(layer* l,long max_l)
 {
-    for(long i = 0; i < l->length; i++)
-        free_neuron((l->array[i]));
+    for(long i = 0; i < max_l; i++)
+        free_neuron_on_load((l->array[i]));
     free(l->array);
     free(l);
 }
 
-void free_network(network* n)
+void free_network_on_load(network* n,long max_l)
 {
-    for(long i = 0; i < n->length; i++)
-        free_layer(n->array[i]);
+    for(long i = 0; i < max_l; i++)
+        free_layer_on_load(n->array[i],n->length);
     free(n->array);
     free(n);
 }
+
+//========================================
+
+//============HELPER FUNCTIONS============
 
 /*
 Detects the next occurence of 'to_read' in the file 'file'.
@@ -122,7 +130,7 @@ neuron* load_neuron(FILE* file)
     || read_char(file,'}'))
     {
         printf("Error while reading neuron weights\n");
-        free_neuron(neu);
+        free_neuron_on_load(neu);
         return NULL;
     }
     
@@ -142,7 +150,7 @@ layer* load_layer(FILE* file)
         if(n == NULL)
         {
             printf("Error while loading neuron of layer\n");
-            free_layer(lay);
+            free_layer_on_load(lay,i);
             return NULL;
         }
         lay->array[i] = n;
@@ -150,16 +158,16 @@ layer* load_layer(FILE* file)
     if(read_char(file,']'))
     {
         printf("Error while ending layer\n");
-        free_layer(lay);
+        free_layer_on_load(lay,lay->length);
         return NULL;
     }
 
     return lay;
 }
 
-network* load_network_error(network* net)
+network* load_network_error(network* net,long max_l)
 {
-    free_network(net);
+    free_network_on_load(net,max_l);
     return NULL;
 }
 
@@ -174,11 +182,11 @@ network* load_network(FILE* file)
     {
         layer* l = load_layer(file);
         if(l == NULL)
-            return load_network_error(net);
+            return load_network_error(net,i);
         net->array[i] = l;
     }
     if(read_char(file,')'))
-        return load_network_error(net);
+        return load_network_error(net,net->length);
     return net;
 }
 
@@ -239,7 +247,7 @@ void save_network(network* net,FILE* file)
 
 //===============FUNCTIONS================
 
-network* load_network()
+network* LoadNetwork()
 {
     FILE* file = fopen(save_path,"r");
     network* net = load_network(file);
@@ -247,7 +255,7 @@ network* load_network()
     return net;
 }
 
-void save_network(network* net)
+void SaveNetwork(network* net)
 {
     FILE *file = fopen(save_path,"w");
     save_network(net,file);
