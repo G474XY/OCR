@@ -8,7 +8,7 @@
 const char* training_path = "training/testing.idx3-ubyte";
 const char* labels_path = "training/testing_labels.idx1-ubyte";
 #define img_size 28
-#define img_size_squared img_size * img_size
+const size_t img_size_squared = img_size * img_size;
 #define  num_images 5000
 const size_t uns_char_size = sizeof(unsigned char);
 //=============================
@@ -41,6 +41,43 @@ void print_img(double* arr)
         si = si + img_size;
     }
 }
+//=============================
+
+//=======TRANSFORMATIONS=======
+
+void translate_img(double** image,int x, int y)
+{
+    double* image_copy = calloc(img_size_squared,sizeof(double));
+    int nx,ny;
+    for(int i = 0; i < img_size; i++)
+    {
+        ny =  i + y;
+        if(ny >= 0 && ny < img_size)
+        {
+            for(int j = 0; j < img_size; j++)
+            {
+                nx = j + x;
+                if(nx >= 0 && nx < img_size)
+                {
+                    image_copy[ny * img_size + nx] = 
+                    (*image)[i * img_size + j];
+                }
+            }
+        }
+    }
+
+    for(size_t i = 0; i < img_size_squared; i++)
+    {
+        (*image)[i] = image_copy[i];
+    }
+    free(image_copy);
+}
+
+void cartesian_to_polar(int x, int y,double* r,double* theta)
+{
+    
+}
+
 //=============================
 
 //===========HELPERS===========
@@ -254,10 +291,15 @@ training_image* SetupTrainingArrays()
     }
     return 0;
 }*/
-/*int main()
+int main()
 {
     training_image* t = SetupTrainingArrays();
+    double* img = t->images[0];
+    print_img(img);
+    printf("\n");
+    translate_img(&(img),-7,10);
+    print_img(img);
     FreeTrainingArrays(t);
     return 0;
-}*/
+}
 //=============================
