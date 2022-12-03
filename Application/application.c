@@ -20,12 +20,14 @@ typedef struct Data
 
 void resize_image(Data* data,GdkPixbuf** image)
 {
+    GtkWidget* widgimage = GTK_WIDGET(data->ui.image);
+
     //image is a pointer to the buffer of the newly loaded image. (from a file)
     int w = gdk_pixbuf_get_width(*image);
     int h = gdk_pixbuf_get_height(*image);
 
-    int max_w = gtk_widget_get_allocated_width(GTK_WIDGET(data->ui.image));
-    int max_h = gtk_widget_get_allocated_height(GTK_WIDGET(data->ui.image));
+    int max_w = gtk_widget_get_allocated_width(widgimage);
+    int max_h = gtk_widget_get_allocated_height(widgimage);
     
     float rap = (float) w / h;
     float max_rap = (float) max_w / max_h;
@@ -75,10 +77,9 @@ void on_load_file(GtkFileChooserButton* button,gpointer user_data)
     change_image(data,path);
 }
 
-
 void on_start(GtkButton* button,gpointer user_data)
 {
-    g_print("%sInitializing processing...\n",term_pref);
+    /*g_print("%sInitializing processing...\n",term_pref);
     g_print("%sRetrieving image...\n",term_pref);
     g_print("%sApplying pre-processing on image...\n",term_pref);
     g_print("%sDetecting grid...\n",term_pref);
@@ -86,6 +87,9 @@ void on_start(GtkButton* button,gpointer user_data)
     g_print("%sSolving found sudoku grid...\n",term_pref);
     g_print("%sRendering solved grid...\n",term_pref);
     g_print("%sEnding processing...\n",term_pref);
+    */
+    
+
     if(button || user_data)
         return;
 }
