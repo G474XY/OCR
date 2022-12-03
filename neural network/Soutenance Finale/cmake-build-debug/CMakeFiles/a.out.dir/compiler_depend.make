@@ -26,7 +26,9 @@ CMakeFiles/a.out.dir/NN.c.obj: C:/Users/virtu/Documents/GitHub/neural\ network/S
   C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/errno.h \
   C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/math.h \
   C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/string.h \
-  C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/sec_api/string_s.h
+  C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/sec_api/string_s.h \
+  C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/NNtraining.h \
+  C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/NNsave.h
 
 CMakeFiles/a.out.dir/NNsave.c.obj: C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/NNsave.c \
   C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/stdio.h \
@@ -130,10 +132,12 @@ C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include
 
 C:/Program\ Files/JetBrains/CLion\ 2022.2.3/bin/mingw/x86_64-w64-mingw32/include/sec_api/string_s.h:
 
+C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/NNtraining.h:
+
+C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/NNsave.h:
+
 C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/NNsave.c:
 
 C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/NNtraining.c:
 
 C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/allocfree.h:
-
-C:/Users/virtu/Documents/GitHub/neural\ network/Soutenance\ Finale/NNtraining.h:

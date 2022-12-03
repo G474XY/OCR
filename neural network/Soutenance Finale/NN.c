@@ -68,7 +68,7 @@ double dssoftmax(double a, double partial_sum, double sum){
 
 //Log Loss cost function
 double* cost(double* get, double* expected){
-    double res[nbONode];
+    double* res = malloc(sizeof(double) * nbONode);
     for (int i = 0; i < nbONode; ++i) {
         res[i] = -1 * (get[i] * log(expected[i])
                 + (1 - get[i]) * log(1 - expected[i]));
@@ -227,7 +227,7 @@ void training(network* network, training_image input, long epoch, double learnin
                 tmp[k] = network->array[network->length - 1]->array[k]->value;
             }
 
-            //Calc value
+            //Calc array in tmp format
             double expected[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             expected[j%10] = 1;
 
@@ -238,7 +238,7 @@ void training(network* network, training_image input, long epoch, double learnin
 
             //Backward
             backwardpass(*network, tmp, input.images[j], c, learning_rate);
-
+            free(c);
         }
 
     }
@@ -333,6 +333,7 @@ int main(int argc, char **argv){
     if(argc >= 2 && strcmp(argv[1], "-t") == 0){ // Check if test mode
         training_image* input = SetupTrainingArrays();
         training(&a, *input, 1000, 0.01);
+        //save weight
         FreeTrainingArrays(input);
 
     }
