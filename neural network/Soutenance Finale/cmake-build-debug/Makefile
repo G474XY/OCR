@@ -200,6 +200,30 @@ NNtraining.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\a.out.dir\build.make CMakeFiles/a.out.dir/NNtraining.c.s
 .PHONY : NNtraining.c.s
 
+allocfree.obj: allocfree.c.obj
+.PHONY : allocfree.obj
+
+# target to build an object file
+allocfree.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\a.out.dir\build.make CMakeFiles/a.out.dir/allocfree.c.obj
+.PHONY : allocfree.c.obj
+
+allocfree.i: allocfree.c.i
+.PHONY : allocfree.i
+
+# target to preprocess a source file
+allocfree.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\a.out.dir\build.make CMakeFiles/a.out.dir/allocfree.c.i
+.PHONY : allocfree.c.i
+
+allocfree.s: allocfree.c.s
+.PHONY : allocfree.s
+
+# target to generate assembly for a file
+allocfree.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\a.out.dir\build.make CMakeFiles/a.out.dir/allocfree.c.s
+.PHONY : allocfree.c.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -218,6 +242,9 @@ help:
 	@echo ... NNtraining.obj
 	@echo ... NNtraining.i
 	@echo ... NNtraining.s
+	@echo ... allocfree.obj
+	@echo ... allocfree.i
+	@echo ... allocfree.s
 .PHONY : help
 
 

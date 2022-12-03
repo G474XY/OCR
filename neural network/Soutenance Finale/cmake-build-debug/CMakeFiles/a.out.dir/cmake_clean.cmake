@@ -5,6 +5,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/a.out.dir/NNsave.c.obj.d"
   "CMakeFiles/a.out.dir/NNtraining.c.obj"
   "CMakeFiles/a.out.dir/NNtraining.c.obj.d"
+  "CMakeFiles/a.out.dir/allocfree.c.obj"
+  "CMakeFiles/a.out.dir/allocfree.c.obj.d"
   "a.out.exe"
   "a.out.exe.manifest"
   "a.out.pdb"

@@ -11,6 +11,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/virtu/Documents/GitHub/neural network/Soutenance Finale/NN.c" "CMakeFiles/a.out.dir/NN.c.obj" "gcc" "CMakeFiles/a.out.dir/NN.c.obj.d"
   "C:/Users/virtu/Documents/GitHub/neural network/Soutenance Finale/NNsave.c" "CMakeFiles/a.out.dir/NNsave.c.obj" "gcc" "CMakeFiles/a.out.dir/NNsave.c.obj.d"
   "C:/Users/virtu/Documents/GitHub/neural network/Soutenance Finale/NNtraining.c" "CMakeFiles/a.out.dir/NNtraining.c.obj" "gcc" "CMakeFiles/a.out.dir/NNtraining.c.obj.d"
+  "C:/Users/virtu/Documents/GitHub/neural network/Soutenance Finale/allocfree.c" "CMakeFiles/a.out.dir/allocfree.c.obj" "gcc" "CMakeFiles/a.out.dir/allocfree.c.obj.d"
   )
 
 # Targets to which this target links.

@@ -3,4 +3,4 @@ project(untitled C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(a.out NN.c NN.h NNsave.c NNsave.h NNtraining.c NNtraining.h)
+add_executable(a.out NN.c NN.h NNsave.c NNsave.h NNtraining.c NNtraining.h allocfree.c allocfree.h)

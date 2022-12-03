@@ -327,18 +327,19 @@ void free_network(network* a){
 }
 
 
-int main(int argc, char **argv){
+int main(){
 
-    const double learning_rate = 0.1f;
-    network* a;
-    if(!access( "save/XOR3.txt", F_OK))
-        a = initialisation();
-    else
+    double learning_rate = 0.1f;
+    network* a = NULL;
+    if(!access( "save/Network.txt", F_OK))
         a = LoadNetwork();
+    else
+        a = initialisation();
+
 
     //if(strcmp(argv[1], "-t") == 0){ // Check if test mode
         training_image* input = SetupTrainingArrays();
-        training(a, *input, 1000, 0.01);
+        training(a, *input, 1000, learning_rate);
         SaveNetwork(a);
         FreeTrainingArrays(input);
 

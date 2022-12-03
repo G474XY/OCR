@@ -94,6 +94,12 @@
 		<Unit filename="C:/Users/virtu/Documents/GitHub/neural network/Soutenance Finale/NNtraining.h">
 			<Option target="a.out"/>
 		</Unit>
+		<Unit filename="C:/Users/virtu/Documents/GitHub/neural network/Soutenance Finale/allocfree.c">
+			<Option target="a.out"/>
+		</Unit>
+		<Unit filename="C:/Users/virtu/Documents/GitHub/neural network/Soutenance Finale/allocfree.h">
+			<Option target="a.out"/>
+		</Unit>
 		<Unit filename="C:/Users/virtu/Documents/GitHub/neural network/Soutenance Finale/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
