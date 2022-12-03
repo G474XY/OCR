@@ -75,7 +75,7 @@ void translate_img(double** image,int x, int y)
 
 void cartesian_to_polar(int x, int y,double* r,double* theta)
 {
-    
+
 }
 
 //=============================
@@ -291,7 +291,7 @@ training_image* SetupTrainingArrays()
     }
     return 0;
 }*/
-int main()
+/*int main()
 {
     training_image* t = SetupTrainingArrays();
     double* img = t->images[0];
@@ -301,5 +301,5 @@ int main()
     print_img(img);
     FreeTrainingArrays(t);
     return 0;
-}
+}*/
 //=============================
