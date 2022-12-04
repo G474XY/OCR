@@ -242,7 +242,7 @@ void training(network* network, training_image input, long epoch, double learnin
             //Get result softmax int tmp array
             double soft[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             for (int k = 0; k < nbONode; k++) {
-                soft[k] = network->array[network->length - 1]->array[k]->value;
+                soft[k] = ((network->array[network->length - 1])->array[k])->value;
             }
 
             //Calc array in tmp format
@@ -282,7 +282,7 @@ neuron* neuron_init(long nb_weight){
 layer* layer_init(long nb_neuron, long nb_weight){
     layer* a = malloc(sizeof(layer));
     a->length = nb_neuron;
-    a->array = malloc(sizeof(neuron) * nb_neuron);
+    a->array = malloc(sizeof(neuron*) * nb_neuron);
     for (int i = 0; i < nb_neuron; i++) {
         a->array[i] = neuron_init(nb_weight);
     }
@@ -293,9 +293,9 @@ network* initialisation(){
 
     long nb_layer = nbILayer + nbHLayer + nbOLayer;
 
-    network* a = malloc(sizeof(network) * nb_layer);
+    network* a = malloc(sizeof(network));
     a->length = nb_layer;
-    a->array = malloc(sizeof(layer) * a->length);
+    a->array = malloc(sizeof(layer*) * (a->length));
 
     long n = 0;
 
