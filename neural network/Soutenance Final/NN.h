@@ -25,4 +25,6 @@ struct network {
     long length;
 };
 
+int neural_network();
+
 #endif //OCR_NN_H
