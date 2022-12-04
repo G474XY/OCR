@@ -4,6 +4,7 @@
 #include <math.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "NNtraining.h"
 #include "NNsave.h"
@@ -17,8 +18,8 @@
 #define nbHNode 16
 #define nbONode 10
 
-double randomizer(){
-    return (double) rand() / (RAND_MAX / 3);
+double he(double previous_layer_size){
+    return (rand()/RAND_MAX) * sqrt(2/previous_layer_size);
 }
 
 long getmax(layer* a) {
@@ -193,28 +194,58 @@ void input_backprop(network* a, double* input, double* previous_error, double le
 long forwardpass(network* a, double* input, double learning_rate){
 
     //Input Layer
-    for (int i = 0; i < a->array[0]->length; ++i) {
+    for (int i = 0; i < a->array[0]->length; i++) {
         a->array[0]->array[i]->value = LeakyReLU(Z(*a->array[0]->array[i], input, NULL), learning_rate);
     }
+        /*for (long l = 0; l < a->array[0]->length; l++) {
+
+            printf("Layer: %ld    Neurone: %ld    Value: %f\n", 0, l, a->array[0]->array[l]->value);
+            printf("Layer: %ld    Neurone: %ld    Bias: %f\n", 0, l, a->array[0]->array[l]->bias);
+
+            for (int m = 0; m < a->array[0]->array[l]->weight_length; m++) {
+                printf("Layer: %ld    Neurone: %ld    Weight: %f\n", 0, l, a->array[0]->array[l]->weight[m]);
+            }
+        }*/
 
     //Hidden Layer
-    for (int i = 1; i < a->length - 1; ++i) {
+    for (int i = 1; i < a->length - 1; i++) { //pb i
         for (int j = 0; j < a->array[i]->length; ++j) {
-            a->array[i]->array[j]->value = LeakyReLU(Z(*a->array[i]->array[j], NULL,*a->array[i-1]->array), learning_rate);
+            a->array[i]->array[j]->value = LeakyReLU(Z(*a->array[i]->array[j], NULL, *a->array[i - 1]->array), learning_rate);
         }
+
+        /*for (long l = 0; l < a->array[0]->length; l++) {
+
+            printf("Layer: %ld    Neurone: %ld    Value: %f\n", 0, l, a->array[i]->array[l]->value);
+            printf("Layer: %ld    Neurone: %ld    Bias: %f\n", i, l, a->array[i]->array[l]->bias);
+
+            for (int m = 0; m < a->array[0]->array[l]->weight_length; m++) {
+                printf("Layer: %ld    Neurone: %ld    Weight: %f\n", i, l, a->array[i]->array[l]->weight[m]);
+            }
+        }*/
     }
+
 
     //Output Layer
 
     //sum for softmax
     double sum = 0;
-    for (long i = 0; i < a->array[a->length-1]->length; ++i) {
+    for (long i = 0; i < a->array[a->length-1]->length; i++) {
         sum += exp(Z(*a->array[a->length-1]->array[i],NULL, *a->array[a->length - 2]->array));
     }
 
-    for (long i = 0; i < a->array[a->length - 1]->length; ++i) {
+    for (long i = 0; i < a->array[a->length - 1]->length; i++) {
         a->array[a->length - 1]->array[i]->value = softmax(Z(*a->array[a->length-1]->array[i], NULL,
                                                             *a->array[a->length - 2]->array), sum);
+    }
+
+    for (long l = 0; l < a->array[a->length - 1]->length; l++) {
+
+        printf("Layer: %ld    Neurone: %ld    Value: %f\n", a->length - 1, l, a->array[a->length - 1]->array[l]->value);
+        printf("Layer: %ld    Neurone: %ld    Bias: %f\n", a->length - 1, l, a->array[a->length - 1]->array[l]->bias);
+
+        for (int m = 0; m < a->array[0]->array[l]->weight_length; m++) {
+            printf("Layer: %ld    Neurone: %ld    Weight: %f\n", a->length - 1, l, a->array[a->length - 1]->array[l]->weight[m]);
+        }
     }
 
     return getmax(a->array[a->length-1]);
@@ -252,17 +283,6 @@ void training(network* network, training_image input, long epoch, double learnin
             //printf("Enter: %d      Get: %ld       The margin of error: %f\n",
 		    //input.labels[j], res, error);
 
-            for (long k = 0; k < network->length; k++) {
-                for (long l = 0; l < network->array[k]->length; l++) {
-                    printf("Layer: %ld    Neurone: %ld    Value: %f\n", k, l, network->array[k]->array[l]->value);
-                    printf("Layer: %ld    Neurone: %ld    Bias: %f\n", k, l, network->array[k]->array[l]->bias);
-
-                    for (int m = 0; m < network->array[k]->array[l]->weight_length; m++) {
-                        printf("Layer: %ld    Neurone: %ld    Weight: %f\n", k, l, network->array[k]->array[l]->weight[m]);
-                    }
-                }
-            }
-
             //Backward
             backwardpass(network, soft, input.images[j], cost_array, learning_rate);
 
@@ -271,24 +291,24 @@ void training(network* network, training_image input, long epoch, double learnin
     }
 }
 
-neuron* neuron_init(long nb_weight){
+neuron* neuron_init(long nb_weight, long previous_layer_size){
     neuron* a = malloc(sizeof(neuron));
     a->value = 0;
-    a->bias = randomizer();
+    a->bias = he((double) previous_layer_size);
     a->weight_length = nb_weight;
     a->weight = malloc(sizeof(double) * nb_weight);
     for(int k = 0; k < nb_weight; k++) {
-        a->weight[k] = randomizer();
+        a->weight[k] = he((double) previous_layer_size);
     }
     return a;
 }
 
-layer* layer_init(long nb_neuron, long nb_weight){
+layer* layer_init(long nb_neuron, long nb_weight, long previous_layer_size){
     layer* a = malloc(sizeof(layer));
     a->length = nb_neuron;
     a->array = malloc(sizeof(neuron*) * nb_neuron);
     for (int i = 0; i < nb_neuron; i++) {
-        a->array[i] = neuron_init(nb_weight);
+        a->array[i] = neuron_init(nb_weight, previous_layer_size);
     }
     return a;
 }
@@ -301,28 +321,16 @@ network* initialisation(){
     a->length = nb_layer;
     a->array = malloc(sizeof(layer*) * (a->length));
 
-    long n = 0;
 
-    //------------------------- I Layer -------------------------
-    for (int i = 0; i < nbILayer; i++) {
-        a->array[n] = layer_init(nbInput, nbInput);
-        n++;
+    a->array[0] = layer_init(nbInput, nbInput, nbInput);
+
+    a->array[1] = layer_init(nbHNode, nbInput, a->array[0]->length);
+
+    for (int i = 2; i < nbHLayer + 1; i++) {
+        a->array[i] = layer_init(nbHNode, nbHNode, a->array[i-1]->length);
     }
 
-    //------------------------- H Layer -------------------------
-    a->array[n] = layer_init(nbHNode, nbInput);
-    n++;
-
-    for (int i = 0; i < nbHLayer; i++) {
-        a->array[n] = layer_init(nbHNode, nbHNode);
-        n++;
-    }
-
-    //------------------------- O Layer -------------------------
-    for (int i = 0; i < nbOLayer; i++) {
-        a->array[n] = layer_init(nbONode, nbHNode);
-        n++;
-    }
+    a->array[nb_layer - 1] = layer_init(nbONode, nbHNode, a->array[nb_layer -2]->length);
 
     return a;
 }
@@ -359,6 +367,8 @@ int neural_network(){
     else
         a = initialisation();
 
+    srand(time(NULL));
+
     training_image* input = SetupTrainingArrays();
     training(a, *input, 1, learning_rate);
     SaveNetwork(a);
@@ -367,3 +377,4 @@ int neural_network(){
 
     return 0;
 }
+// Trouver le 0 originel
