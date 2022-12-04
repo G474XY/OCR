@@ -7,6 +7,7 @@
 typedef struct UI
 {
     GtkImage* image;
+    char* image_path;
     GtkWindow* window;
     GtkFixed* fixed;
     GtkButton* start_button;
@@ -50,7 +51,7 @@ void resize_image(Data* data,GdkPixbuf** image)
     *image = gdk_pixbuf_scale_simple(*image,width,height,GDK_INTERP_BILINEAR);
 }
 
-void change_image(Data* data,char* path)
+char change_image(Data* data,char* path)
 {
     GError** error = NULL;
     
@@ -58,7 +59,7 @@ void change_image(Data* data,char* path)
     if(pixbuf == NULL)
     {
         g_print("%sWarning : the specified path is not an image!\n",term_pref);
-        return;
+        return 1; //Error
     }
 
     resize_image(data,&pixbuf);
@@ -66,6 +67,7 @@ void change_image(Data* data,char* path)
     gtk_image_set_from_pixbuf(data->ui.image,pixbuf);
 
     //gtk_image_set_from_file(oldimage,path);
+    return 0;
 }
 
 void on_load_file(GtkFileChooserButton* button,gpointer user_data)
@@ -73,9 +75,43 @@ void on_load_file(GtkFileChooserButton* button,gpointer user_data)
     Data *data = user_data;
     char* path = gtk_file_chooser_get_filename(
         GTK_FILE_CHOOSER(data->ui.load_button));
+    data->ui.image_path = path;
     g_print("%sLoading image at path %s\n",term_pref,path);
-    change_image(data,path);
+    if(change_image(data,path))
+        data->ui.image_path = NULL;
 }
+
+//========================================
+
+//===========LINKING FUNCTIONS============
+
+char pre_traitement(Data* data)
+{
+    if(data->ui.image_path == NULL)
+    {
+        return 1; //Error
+    }
+
+
+    return 0;
+}
+
+void get_grid()
+{
+
+}
+
+void get_grid_from_nn()
+{
+
+}
+
+void solve_sudoku()
+{
+    //solveSudoku(grid);
+}
+
+//========================================
 
 void on_start(GtkButton* button,gpointer user_data)
 {
@@ -88,7 +124,11 @@ void on_start(GtkButton* button,gpointer user_data)
     g_print("%sRendering solved grid...\n",term_pref);
     g_print("%sEnding processing...\n",term_pref);
     */
-    
+
+   pre_traitement();
+   get_grid();
+   get_grid_from_nn();
+   solve_sudoku();
 
     if(button || user_data)
         return;
@@ -119,6 +159,7 @@ int main()
         .ui = 
         {
             .image = GTK_IMAGE(image),
+            .image_path = NULL;
             .window = window,
             .fixed = fixed,
             .start_button = button,
