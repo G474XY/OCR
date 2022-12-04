@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <time.h>
 #include "allocfree.h"
 #include "NNtraining.h"
 
@@ -8,9 +10,11 @@
 const char* training_path = "training/testing.idx3-ubyte";
 const char* labels_path = "training/testing_labels.idx1-ubyte";
 #define img_size 28
+#define pi 3.1415926535
 const size_t img_size_squared = img_size * img_size;
 #define  num_images 5000
 const size_t uns_char_size = sizeof(unsigned char);
+const float center_coord = img_size / 2 - 0.5;
 //=============================
 
 //=======GLOBAL VARIABLES======
@@ -40,6 +44,26 @@ void print_img(double* arr)
         printf("]\n");
         si = si + img_size;
     }
+}
+
+double random_double(double max)
+{
+    return (rand() / (double)RAND_MAX) * max;
+}
+
+double random_signed_double(double max)
+{
+    return (rand() / (double)RAND_MAX) * (2 * max) - max;
+}
+
+double random_int(int max)
+{
+    return (rand() / (double)RAND_MAX) * max;
+}
+
+double random_signed_int(int max)
+{
+    return (rand() / (double)RAND_MAX) * (2*max) - max;
 }
 //=============================
 
@@ -73,10 +97,69 @@ void translate_img(double** image,int x, int y)
     free(image_copy);
 }
 
-/*void cartesian_to_polar(int x, int y,double* r,double* theta)
+void cartesian_to_polar(float cx,float cy,dot cartesian,double* r,double* theta)
 {
+    float dx = cartesian.x - cx;
+    float dy = cartesian.y - cy;
 
-}*/
+    *r = sqrt(dx * dx + dy * dy);
+    *theta = acos(dx / *r) * ((dy >= 0) * 2 - 1);
+}
+
+void polar_to_cartesian(float cx, float cy,double r,double theta,dot* cartesian)
+{
+    double dx = cos(theta) * r;
+    double dy = sin(theta) * r;
+    
+    cartesian->x = (int)(round(dx + cx));
+    cartesian->y = (int)(round(dy + cy));
+}
+
+void rotate_img(double** image,double d_theta)
+{
+    double* image_copy = calloc(img_size_squared,sizeof(double));
+    dot cartesian = {0,0};
+    double r = 0;
+    double theta = 0;
+    size_t c = 0;
+    for(int y = 0; y < img_size; y++)
+    {
+        for(int x = 0; x < img_size; x++)
+        {
+            cartesian.x = x;
+            cartesian.y = y;
+            cartesian_to_polar(center_coord,center_coord,cartesian,
+            &r,&theta);
+            theta += d_theta;
+            polar_to_cartesian(center_coord,center_coord,r,theta,
+            &cartesian);
+            if(cartesian.x >= 0 && cartesian.x < img_size
+            && cartesian.y >= 0 && cartesian.y < img_size)
+                image_copy[cartesian.y * img_size + cartesian.x] = (*image)[c];
+            c++;
+        }
+    }
+
+    for(size_t i = 0; i < img_size_squared; i++)
+    {
+        (*image)[i] = image_copy[i];
+    }
+}
+
+void rotate_img_degrees(double** image,double theta)
+{
+    rotate_img(image,theta * pi / 180);
+}
+
+void apply_rand_transformations(double** image)
+{
+    double theta = random_signed_double(8);
+    int dx = random_signed_int(3);
+    int dy = random_signed_int(3);
+    rotate_img_degrees(image,theta);
+    translate_img(image,dx,dy);
+    //printf("%lf | %d,%d\n",theta,dx,dy);
+}
 
 //=============================
 
@@ -256,6 +339,7 @@ training_image* SetupTrainingArrays()
     for(size_t i = 0; i < num_images; i++)
     {
         img = GetNextImage(file,l_file,&label);
+        apply_rand_transformations(&img);
         if(img == NULL)
             break;
         images[i] = img;
@@ -291,15 +375,18 @@ training_image* SetupTrainingArrays()
     }
     return 0;
 }*/
-/*int main()
+
+int main()
 {
+    srand((unsigned) time(NULL));
+
     training_image* t = SetupTrainingArrays();
-    double* img = t->images[0];
-    print_img(img);
-    printf("\n");
-    translate_img(&(img),-7,10);
-    print_img(img);
+    //double* img = t->images[0];
+    for(int i = 0; i < 10; i++)
+        print_img(t->images[i]);
     FreeTrainingArrays(t);
+    
+
     return 0;
-}*/
+}
 //=============================

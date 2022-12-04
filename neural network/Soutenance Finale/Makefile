@@ -6,7 +6,8 @@ CFLAGS = -Wall -Wextra
 LDFLAGS =
 LDLIBS = -lm
 
-SRC = NNsave.c NNtraining.c allocfree.c NN.c
+TRN = NNtraining.c allocfree.c
+SRC = NNsave.c NN.c ${TRN}
 EXE = main
 
 all:

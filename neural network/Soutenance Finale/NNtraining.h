@@ -9,6 +9,12 @@ typedef struct training_image
     char* labels; //Array des labels associés à chacune des images.
 } training_image;
 
+typedef struct dot
+{
+    int x;
+    int y;
+} dot;
+
 void print_img(double* arr); //Affiche une image en 'ascii art'.
 
 /*
