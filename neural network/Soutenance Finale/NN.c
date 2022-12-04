@@ -18,15 +18,19 @@
 #define nbONode 10
 
 int randomizer(){
-    return ((double)rand())/((double)RAND_MAX);
+    return ((double) rand()) / RAND_MAX;
 }
 
-double getmax(layer* a) {
+long getmax(layer* a) {
     double max = a->array[0]->value;
+    long max_i = 0;
     for (long i = 0; i < a->length; i++) {
-        max = a->array[i]->value > max ? a->array[i]->value : max;
+        if(a->array[i]->value > max) {
+            max = a->array[i]->value;
+            max_i = i;
+        }
     }
-    return max;
+    return max_i;
 }
 
 double LeakyReLU(double z, double alpha){
@@ -189,17 +193,17 @@ void input_backprop(network* a, double* input, double* previous_error, double le
 
 }
 
-double forwardpass(network a, double* input, double learning_rate){
+long forwardpass(network* a, double* input, double learning_rate){
 
     //Input Layer
-    for (int i = 0; i < a.array[0]->length; ++i) {
-        a.array[0]->array[i]->value = LeakyReLU(Z2(*a.array[0]->array[i], input), learning_rate);
+    for (int i = 0; i < a->array[0]->length; ++i) {
+        a->array[0]->array[i]->value = LeakyReLU(Z2(*a->array[0]->array[i], input), learning_rate);
     }
 
     //Hidden Layer
-    for (int i = 1; i < a.length - 1; ++i) {
-        for (int j = 0; j < a.array[i]->length; ++j) {
-            a.array[i]->array[j]->value = LeakyReLU(Z1(*a.array[i]->array[j], *a.array[i-1]->array), learning_rate);
+    for (int i = 1; i < a->length - 1; ++i) {
+        for (int j = 0; j < a->array[i]->length; ++j) {
+            a->array[i]->array[j]->value = LeakyReLU(Z1(*a->array[i]->array[j], *a->array[i-1]->array), learning_rate);
         }
     }
 
@@ -207,16 +211,16 @@ double forwardpass(network a, double* input, double learning_rate){
 
     //sum for softmax
     double sum = 0;
-    for (long i = 0; i < a.array[a.length-1]->length; ++i) {
-        sum += exp(Z1(*a.array[a.length-1]->array[i], *a.array[a.length - 2]->array));
+    for (long i = 0; i < a->array[a->length-1]->length; ++i) {
+        sum += exp(Z1(*a->array[a->length-1]->array[i], *a->array[a->length - 2]->array));
     }
 
-    for (long i = 0; i < a.array[a.length - 1]->length; ++i) {
-        a.array[a.length - 1]->array[i]->value = softmax(Z1(*a.array[a.length-1]->array[i],
-                                                            *a.array[a.length - 2]->array), sum);
+    for (long i = 0; i < a->array[a->length - 1]->length; ++i) {
+        a->array[a->length - 1]->array[i]->value = softmax(Z1(*a->array[a->length-1]->array[i],
+                                                            *a->array[a->length - 2]->array), sum);
     }
 
-    return getmax(a.array[a.length-1]);
+    return getmax(a->array[a->length-1]);
 }
 
 void backwardpass(network* a, double* get, double* input, double* cost, double learning_rate){
@@ -233,7 +237,7 @@ void training(network* network, training_image input, long epoch, double learnin
         for (size_t j = 0; j < input.nb_images; j++) {
 
             //Forward
-            double res = forwardpass(*network, input.images[j], learning_rate);
+            long res = forwardpass(network, input.images[j], learning_rate);
 
             //Get result softmax int tmp array
             double soft[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -243,12 +247,13 @@ void training(network* network, training_image input, long epoch, double learnin
 
             //Calc array in tmp format
             double expected[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            expected[j%10] = 1;
+            expected[(int)input.labels[j]] = 1;
 
             //Calc error
             double* cost_array = cost(soft, (double *) expected);
             double error = average(cost_array);
-            printf("Enter: %d      Get: %f       The margin of error: %f\n", input.labels[j], res, error);
+            printf("Enter: %d      Get: %ld       The margin of error: %f\n",
+		    input.labels[j], res, error);
 
             //Backward
             backwardpass(network, soft, input.images[j], cost_array, learning_rate);
