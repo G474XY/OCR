@@ -70,7 +70,7 @@ double dssoftmax(double a, double partial_sum, double sum){
 //Log Loss cost function
 double* cost(double* get, double* expected){
     double* res = malloc(sizeof(double) * nbONode);
-    for (int i = 0; i < nbONode; ++i) {
+    for (int i = 0; i < nbONode; i++) {
         res[i] = -1 * (get[i] * log(expected[i])
                 + (1 - get[i]) * log(1 - expected[i]));
     }
@@ -81,7 +81,7 @@ double* cost(double* get, double* expected){
 double average(double* a){
 
     double res = 0;
-    for (int i = 0; i < nbONode; ++i) {
+    for (int i = 0; i < nbONode; i++) {
         res += a[i];
     }
     return (1/nbONode) * res;
@@ -89,11 +89,104 @@ double average(double* a){
 
 double partial_sum(layer* a, int except){
     double res = 0;
-    for (int i = 0; i < nbONode; ++i) {
+    for (int i = 0; i < nbONode; i++) {
         if(i != except)
             res += a->array[i]->value;
     }
     return res;
+}
+
+void output_backprop(network* a, double* get, double* error, double learning_rate){
+
+    //Sum of value
+    double sum = 0;
+    for (int i = 0; i < nbONode; ++i) {
+        sum += get[i];
+    }
+
+    //Compute dSoftmax
+    double* ds = malloc(a->array[a->length - 1]->length * sizeof(double));
+
+    for (int i = 0; i < a->array[a->length - 1]->length; i++) {
+        double ps = partial_sum(a->array[a->length - 1], i);
+        ds[i] = dssoftmax(a->array[a->length - 1]->array[i]->value, ps, sum);
+    }
+
+    //Compute dW, dB and apply change
+    for (int i = 0; i <  a->array[a->length - 1]->length; i++) {
+
+        a->array[a->length - 1]->array[i]->bias -= learning_rate * ds[i] * error[i];
+        a->array[a->length - 1]->array[i]->value = ds[i];
+
+        for(int j = 0; j < a->array[a->length - 1]->array[i]->weight_length; j++) {
+            a->array[a->length - 1]->array[i]->weight[j] -= learning_rate *
+                    (a->array[a->length - 2]->array[j]->value * ds[i] * error[i]); //E * df * value_previous_layer
+        }
+    }
+
+    free(ds);
+}
+
+void hidden_backprop(network* a, double* previous_error, double learning_rate){
+
+    for (int i = a->length - 2; i > 0; i--) {
+
+        //Compute Error
+        double* new_error = malloc(a->array[i]->length * sizeof(double));
+
+        for (int j = 0; j < a->array[i]->length; j++) {
+            for (int k = 0; k < a->array[i+1]->length; k++) {
+                new_error[j] += previous_error[k] * a->array[i+1]->array[k]->value * a->array[i+1]->array[k]->weight[j]; // W_following_layer * E_follow * ds_following(get in value)
+            }
+        }
+
+
+        //Apply change
+        for (int j = 0; j <  a->array[i]->length; j++) {
+
+            double ds = dsLeakyReLU(a->array[i]->array[j]->value, 0.01);
+
+            a->array[i]->array[j]->bias -= learning_rate * ds * new_error[j];
+            a->array[i]->array[j]->value = ds;
+
+            for(int k = 0; k < a->array[i]->array[j]->weight_length; k++) {
+                a->array[i]->array[j]->weight[k] -= learning_rate *
+                        (ds * new_error[j] * a->array[i - 1]->array[j]->value); //E * df * value_previous_layer
+            }
+        }
+	
+//	double *tmp = previous_error;
+//        free(tmp);
+        previous_error = new_error;
+    }
+}
+
+void input_backprop(network* a, double* input, double* previous_error, double learning_rate){
+
+    //Compute Error
+    double* new_error = malloc(a->array[0]->length * sizeof(double));
+
+    for (int j = 0; j < a->array[0]->length; j++) {
+        for (int k = 0; k < a->array[1]->length; k++) {
+            new_error[j] += previous_error[k] * a->array[1]->array[k]->value * a->array[1]->array[k]->weight[j]; // W_following_layer * E_follow * ds_following(get in value)
+        }
+    }
+
+
+    //Apply change
+    for (int j = 0; j <  a->array[0]->length; j++) {
+
+        double ds = dsLeakyReLU(a->array[0]->array[j]->value, 0.01);
+
+        a->array[0]->array[j]->bias -= learning_rate * ds * new_error[j];
+        a->array[0]->array[j]->value = ds;
+
+        for(int k = 0; k < a->array[0]->array[j]->weight_length; k++) {
+            a->array[0]->array[j]->weight[k] -= learning_rate *
+                                                (ds * new_error[j] * input[k]); //E * df * value_previous_layer
+        }
+    }
+
 }
 
 double forwardpass(network a, double* input, double learning_rate){
@@ -126,106 +219,26 @@ double forwardpass(network a, double* input, double learning_rate){
     return getmax(a.array[a.length-1]);
 }
 
-void backwardpass(network a, double* get, double* input, double* cost, double learning_rate){
-    
-    //Sum of value
-    double sum = 0;
-    for (int i = 0; i < nbONode; ++i) {
-        sum += get[i];
-    }
+void backwardpass(network* a, double* get, double* input, double* cost, double learning_rate){
 
-    //Output Layer
-
-    //Compute dSoftmax
-    double* ds = malloc(a.array[a.length - 1]->length * sizeof(double));
-    for (int i = 0; i < a.array[a.length - 1]->length; i++) {
-        double ps = partial_sum(a.array[a.length - 1], i);
-        ds[i] = dssoftmax(a.array[a.length - 1]->array[i]->value, ps, sum);
-    }
-
-    //Compute dW, dB and apply change
-    for (int i = 0; i <  a.array[a.length - 1]->length; ++i) {
-
-        a.array[a.length - 1]->array[i]->bias -= learning_rate * ds[i] * cost[i];
-        a.array[a.length - 1]->array[i]->value = ds[i];
-
-        for(int j = 0; j < a.array[a.length - 1]->array[i]->weight_length; ++j) {
-            a.array[a.length - 1]->array[i]->weight[j] -= learning_rate *
-                    (a.array[a.length - 2]->array[j]->value * ds[i] * cost[i]);
-        }
-    }
-
-    //Hidden Layer
-
-    double *E = cost;
-
-    for (int i = a.length - 2; i > 0; i--) {
-
-        //Compute dW, dB and apply change
-        double* tmp = malloc(a.array[i]->length);
-
-        for (int j = 0; j < a.array[i]->length; ++j) {
-            for (int k = 0; k < a.array[i+1]->length; ++k) { // conflit de tableau d'erreur
-                tmp[j] += E[k] * a.array[i+1]->array[k]->value * a.array[i+1]->array[k]->weight[j];
-            }
-        }
-
-        free(E);
-        E = tmp;
-
-        //Apply change
-        for (int j = 0; j <  a.array[i]->length; j++) {
-
-            a.array[i]->array[j]->bias -= learning_rate * dsLeakyReLU(a.array[i]->array[j]->value, 0.01) * E[j];
-
-            for(int k = 0; k < a.array[i]->array[j]->weight_length; k++) {
-                a.array[i]->array[j]->weight[k] -= learning_rate *
-                        (dsLeakyReLU(a.array[i]->array[j]->value, 0.01) * E[j] * a.array[i - 1]->array[j]->value);
-            }
-        }
-    }
-
-    //Input Layer
-
-    //Compute dW, dB and apply change
-    double* tmp = malloc(a.array[0]->length);
-
-    for (int j = 0; j < a.array[0]->length; ++j) {
-        for (int k = 0; k < a.array[1]->length; ++k) { // conflit de tableau d'erreur
-            tmp[j] += E[k] * a.array[1]->array[k]->value * a.array[1]->array[k]->weight[j];
-        }
-    }
-
-    free(E);
-    E = tmp;
-
-    //Apply change
-    for (int j = 0; j <  a.array[0]->length; j++) {
-
-        a.array[0]->array[j]->bias -= learning_rate * dsLeakyReLU(a.array[0]->array[j]->value, 0.01) * E[j];
-
-        for(int k = 0; k < a.array[0]->array[j]->weight_length; k++) {
-            a.array[0]->array[j]->weight[k] -= learning_rate *
-                                               (dsLeakyReLU(a.array[0]->array[j]->value, 0.01) * E[j] * input[k]);
-        }
-    }
-
-    free(E);
+    output_backprop(a, get, cost, learning_rate);
+    hidden_backprop(a, cost, learning_rate);
+    input_backprop(a, input, cost, learning_rate);
 }
 
 void training(network* network, training_image input, long epoch, double learning_rate){
 
-    for (long i = 0; i < epoch; ++i) {
+    for (long i = 0; i < epoch; i++) {
 
-        for (int j = 0; j < input.nb_images; ++j) {
+        for (size_t j = 0; j < input.nb_images; j++) {
 
             //Forward
             double res = forwardpass(*network, input.images[j], learning_rate);
 
             //Get result softmax int tmp array
-            double tmp[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            for (int k = 0; k < nbONode; ++k) {
-                tmp[k] = network->array[network->length - 1]->array[k]->value;
+            double soft[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            for (int k = 0; k < nbONode; k++) {
+                soft[k] = network->array[network->length - 1]->array[k]->value;
             }
 
             //Calc array in tmp format
@@ -233,13 +246,14 @@ void training(network* network, training_image input, long epoch, double learnin
             expected[j%10] = 1;
 
             //Calc error
-            double* c = cost(tmp, (double *) expected);
-            double error = average(c);
+            double* cost_array = cost(soft, (double *) expected);
+            double error = average(cost_array);
             printf("Enter: %d      Get: %f       The margin of error: %f\n", input.labels[j], res, error);
 
             //Backward
-            backwardpass(*network, tmp, input.images[j], c, learning_rate);
-            free(c);
+            backwardpass(network, soft, input.images[j], cost_array, learning_rate);
+
+            free(cost_array);
         }
 
     }
@@ -339,7 +353,7 @@ int main(){
 
     //if(strcmp(argv[1], "-t") == 0){ // Check if test mode
         training_image* input = SetupTrainingArrays();
-        training(a, *input, 1000, learning_rate);
+        training(a, *input, 1, learning_rate);
         SaveNetwork(a);
         FreeTrainingArrays(input);
 

@@ -1,3 +1,0 @@
-C:/Users/virtu/Documents/GitHub/neural network/Soutenance Finale/cmake-build-debug/CMakeFiles/a.out.dir
-C:/Users/virtu/Documents/GitHub/neural network/Soutenance Finale/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/virtu/Documents/GitHub/neural network/Soutenance Finale/cmake-build-debug/CMakeFiles/rebuild_cache.dir
