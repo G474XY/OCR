@@ -376,7 +376,7 @@ training_image* SetupTrainingArrays()
     return 0;
 }*/
 
-int main()
+/*int main()
 {
     srand((unsigned) time(NULL));
 
@@ -388,5 +388,5 @@ int main()
     
 
     return 0;
-}
+}*/
 //=============================
