@@ -115,6 +115,144 @@ double partial_sum(layer* a, int except){
     return res;
 }
 
+//----------------------------NEW FUNCTION----------------------------
+double* error_out(layer* layer, double* expected){
+    double* sigma = calloc(layer->length, sizeof(double));
+
+    for (int i = 0; i < layer->length; i++) {
+        sigma[i] = layer->array[i]->value - expected[i];
+    }
+
+    return sigma;
+}
+
+double* error_hid(layer* _layer, layer* previous_layer, double* previous_error){
+    double* sigma = calloc(_layer->length, sizeof(double));
+
+    for (int i = 0; i < _layer->length; i++) {
+        double tmp = 0;
+        for (int j = 0; j < previous_layer->length; ++j) {
+            tmp += previous_error[j] * previous_layer->array[j]->weight[i];
+        }
+
+        tmp *= dsLeakyReLU(_layer->array[i]->value, 0.01);
+        sigma[i] = tmp;
+    }
+    return sigma;
+}
+
+double cross_entropy(layer* layer1, double* expected){
+    double res = 0;
+
+    for (int i = 0; i < layer1->length; i++){
+        res += expected[i] * log(layer1->array[i]->value) + (1 - expected[i]) * log(1 - layer1->array[i]->value);
+    }
+    return -1 * res;
+}
+
+double* dsCross_entropy(layer* layer1, double* expected){
+
+    double* error = calloc(10, sizeof(double));
+
+    for (int i = 0; i < 10; i++) {
+        error[i] = -1 * ((expected[i] * (1. / layer1->array[i]->value) + (1 - expected[i]) * (1. / (1 - layer1->array[i]->value))));
+    }
+
+    return error;
+}
+
+double* dsSoftmax(layer* layer1){
+
+    double sum = 0;
+    for (int i = 0; i < layer1->length; i++) {
+        sum += exp(layer1->array[i]->value);
+    }
+
+    double* res = calloc(layer1->length, sizeof(double));
+    for (int i = 0; i < layer1->length; i++) {
+        res[i] = (exp(layer1->array[i]->value) * partial_sum(layer1, i)) / (sum * sum);
+    }
+
+    return res;
+}
+
+/*double* out_back(layer* output_layer, layer* previous_layer, double* error, double* expected){ //V2 back prop
+
+    double* sigma = calloc(output_layer->length, sizeof(double));
+    double* ds_softmax = dsSoftmax(output_layer);
+
+    for (int i = 0; i < output_layer->length; i++) {
+        sigma[i] = error[i] * ds_softmax[i] * previous_layer->array[i]->value;
+    }
+
+
+}
+
+double* hid_back(){ //V2 back prop
+
+}
+
+double* inp_back(){ //V2 back prop
+
+}
+
+void back_back_prop(network* a, double* expected, double learning_rate){
+
+    double* sigma = NULL;
+    double* previous_sigma = NULL;
+
+    for (int i = a->length-1; i > -1; i--) {
+
+        layer* layer1 = a->array[i];
+
+        if(i == a->length-1){
+            double* error = dsCross_entropy(layer1, expected);
+            double* sigma = out_back();
+        }
+        else if(i == 0){
+
+        }
+        else{
+
+        }
+    }
+
+}*/
+
+void back_prop(network* a, double* expected, double learning_rate){ //Back_prop Martin
+
+    double* sigma = NULL;
+    double* previous_error = NULL;
+
+    for (int i = a->length-1; i > -1; i--) {
+
+        layer* layer1 = a->array[i];
+
+        if(i == a->length-1){
+            sigma = error_out(layer1, expected);
+        }
+        else{
+            if(previous_error != NULL)
+                free(previous_error);
+
+            previous_error = sigma;
+            sigma = error_hid(layer1, a->array[i-1], previous_error);
+        }
+
+        for (int j = 0; j < layer1->length; j++) {
+            neuron* neuron1 = layer1->array[j];
+            neuron1->bias -= learning_rate * sigma[j];
+
+            for (int k = 0; k < neuron1->weight_length; k++) {
+                neuron1->weight[k] -= learning_rate * sigma[j] * neuron1->value;
+            }
+        }
+    }
+
+}
+
+//----------------------------END NEW FUNCTION----------------------------
+
 void output_backprop(network* a, double* get, double* error, double learning_rate){
 
     //Sum of value
@@ -270,7 +408,8 @@ long forwardpass(network* a, double* input, double learning_rate){
     //sum for softmax
     double sum = 0;
     for (long i = 0; i < a->array[a->length-1]->length; i++) {
-        sum += exp(Z(*a->array[a->length-1]->array[i],NULL, a->array[a->length - 2]->array));
+        a->array[a->length-1]->array[i]->value = Z(*a->array[a->length-1]->array[i],NULL, a->array[a->length - 2]->array);
+        sum += exp(a->array[a->length-1]->array[i]->value);
     }
 
     for (long i = 0; i < a->array[a->length - 1]->length; i++) {
@@ -308,26 +447,20 @@ void training(network* network, training_image input, long epoch, double learnin
             //Forward
             long res = forwardpass(network, input.images[j], learning_rate);
 
-            //Get result softmax int tmp array
-            double soft[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            for (int k = 0; k < nbONode; k++) {
-                soft[k] = ((network->array[network->length - 1])->array[k])->value;
-            }
-
             //Calc array in tmp format
             double expected[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             expected[(int)input.labels[j]] = 1;
 
             //Calc error
-            double* cost_array = cost(soft, (double *) expected); //size = 10
-            double error = average(cost_array);
+            //double* cost_array = cost(soft, (double *) expected); //size = 10
+            double error = cross_entropy(network->array[network->length - 1], expected);//average(cost_array);
             printf("Enter: %d      Get: %ld       The margin of error: %f\n",
 		    input.labels[j], res, error);
 
             //Backward
-            backwardpass(network, soft, input.images[j], &cost_array, learning_rate);
-
-            free(cost_array);
+            //backwardpass(network, soft, input.images[j], &cost_array, learning_rate);
+            back_prop(network, expected,learning_rate);
+            //free(cost_array);
         }
     }
 }
