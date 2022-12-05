@@ -144,6 +144,7 @@ void rotate_img(double** image,double d_theta)
     {
         (*image)[i] = image_copy[i];
     }
+    free(image_copy);
 }
 
 void rotate_img_degrees(double** image,double theta)

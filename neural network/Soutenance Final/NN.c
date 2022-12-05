@@ -12,14 +12,16 @@
 #define nbInput 28*28
 
 #define nbILayer 1
-#define nbHLayer 3
+#define nbHLayer 1
 #define nbOLayer 1
 
 #define nbHNode 16
 #define nbONode 10
 
 double he(double previous_layer_size){
-    return (rand()/RAND_MAX) * sqrt(2/previous_layer_size);
+    double res = (rand()/(double)RAND_MAX) * sqrt(2/previous_layer_size);
+    //printf("%lf\n",res);
+    return res;
 }
 
 long getmax(layer* a) {
@@ -38,12 +40,12 @@ double LeakyReLU(double z, double alpha){
     return z >= 0 ? z : alpha * z;
 }
 
-double Z(neuron neurone, double* input, neuron* previous){
+double Z(neuron neurone, double* input, neuron** previous){
     double res = 0;
 
     if(input == NULL){
         for (int i = 0; i < neurone.weight_length; i++) {
-            res += neurone.weight[i] * previous[i].value;
+            res += neurone.weight[i] * previous[i]->value;
         }
     }
     else{
@@ -73,8 +75,11 @@ double dssoftmax(double a, double partial_sum, double sum){
 double* cost(double* get, double* expected){
     double* res = malloc(sizeof(double) * nbONode);
     for (int i = 0; i < nbONode; i++) {
-        res[i] = -1 * (get[i] * log(expected[i])
-                + (1 - get[i]) * log(1 - expected[i]));
+        double logex = expected[i] == 0 ? 0 : log(expected[i]);
+        double lognex = expected[i] == 1 ? 0 : log(1-expected[i]);
+        res[i] = -1 * (get[i] * logex)
+                + (1 - get[i]) * lognex; //TODO : fix log(0) error
+        printf("%lf %lf\n",get[i],res[i]);
     }
 
     return res;
@@ -117,28 +122,32 @@ void output_backprop(network* a, double* get, double* error, double learning_rat
     //Compute dW, dB and apply change
     for (int i = 0; i <  a->array[a->length - 1]->length; i++) {
 
-        a->array[a->length - 1]->array[i]->bias -= learning_rate * ds[i] * error[i];
+        a->array[a->length - 1]->array[i]->bias -= learning_rate * ds[i] * error[i]; //HERE
         a->array[a->length - 1]->array[i]->value = ds[i];
+        //if(isnan(a->array[a->length - 1]->array[i]->bias) || isnan(a->array[a->length - 1]->array[i]->value))
+        //    printf("Line 122\n");
 
         for(int j = 0; j < a->array[a->length - 1]->array[i]->weight_length; j++) {
-            a->array[a->length - 1]->array[i]->weight[j] -= learning_rate *
+            a->array[a->length - 1]->array[i]->weight[j] -= learning_rate * //HERE
                     (a->array[a->length - 2]->array[j]->value * ds[i] * error[i]); //E * df * value_previous_layer
+            //if(isnan(a->array[a->length - 1]->array[i]->weight[j]))
+            //    printf("Line 128\n");
         }
     }
 
     free(ds);
 }
 
-void hidden_backprop(network* a, double* previous_error, double learning_rate){
+void hidden_backprop(network* a, double** previous_error, double learning_rate){
 
     for (int i = a->length - 2; i > 0; i--) {
 
         //Compute Error
-        double* new_error = malloc(a->array[i]->length * sizeof(double));
+        double* new_error = calloc(a->array[i]->length,sizeof(double));
 
         for (int j = 0; j < a->array[i]->length; j++) {
             for (int k = 0; k < a->array[i+1]->length; k++) {
-                new_error[j] += previous_error[k] * a->array[i+1]->array[k]->value * a->array[i+1]->array[k]->weight[j]; // W_following_layer * E_follow * ds_following(get in value)
+                new_error[j] += (*previous_error)[k] * a->array[i+1]->array[k]->value * a->array[i+1]->array[k]->weight[j]; // W_following_layer * E_follow * ds_following(get in value)
             }
         }
 
@@ -149,27 +158,38 @@ void hidden_backprop(network* a, double* previous_error, double learning_rate){
             double ds = dsLeakyReLU(a->array[i]->array[j]->value, 0.01);
 
             a->array[i]->array[j]->bias -= learning_rate * ds * new_error[j];
-            a->array[i]->array[j]->value = ds;
+            a->array[i]->array[j]->value = ds; //HERE
+            //if(isnan(a->array[i]->array[j]->bias) || isnan(a->array[i]->array[j]->value))
+            //    printf("Line 157\n");
 
             for(int k = 0; k < a->array[i]->array[j]->weight_length; k++) {
-                a->array[i]->array[j]->weight[k] -= learning_rate *
+                a->array[i]->array[j]->weight[k] -= learning_rate * //HERE
                         (ds * new_error[j] * a->array[i - 1]->array[j]->value); //E * df * value_previous_layer
+                //if(isnan(a->array[i]->array[j]->weight[k]))
+                //    printf("Line 163\n");
             }
         }
 	
 //	double *tmp = previous_error;
 //        free(tmp);
-        previous_error = new_error;
+        //previous_error = new_error;
+        *previous_error = realloc(*previous_error,a->array[i]->length * sizeof(double));
+        for(long c = 0; c < a->array[i]->length; c++)
+        {
+            (*previous_error)[c] = new_error[c]; //On recopie new_error dans previous_error
+        }
+        free(new_error);
     }
 }
 
 void input_backprop(network* a, double* input, double* previous_error, double learning_rate){
 
     //Compute Error
-    double* new_error = malloc(a->array[0]->length * sizeof(double));
+    double* new_error = calloc(a->array[0]->length,sizeof(double));
 
-    for (int j = 0; j < a->array[0]->length; j++) {
-        for (int k = 0; k < a->array[1]->length; k++) {
+    for (int j = 0; j < a->array[0]->length; j++) { //Len of inp layer
+        for (int k = 0; k < a->array[1]->length; k++) { //Len of first hidden layer
+            //printf("%d | %d\n",j,k);
             new_error[j] += previous_error[k] * a->array[1]->array[k]->value * a->array[1]->array[k]->weight[j]; // W_following_layer * E_follow * ds_following(get in value)
         }
     }
@@ -181,21 +201,27 @@ void input_backprop(network* a, double* input, double* previous_error, double le
         double ds = dsLeakyReLU(a->array[0]->array[j]->value, 0.01);
 
         a->array[0]->array[j]->bias -= learning_rate * ds * new_error[j];
-        a->array[0]->array[j]->value = ds;
+        a->array[0]->array[j]->value = ds; //HERE
+        //if(isnan(a->array[0]->array[j]->bias) || isnan(a->array[0]->array[j]->value))
+        //    printf("Line 200\n");
 
         for(int k = 0; k < a->array[0]->array[j]->weight_length; k++) {
-            a->array[0]->array[j]->weight[k] -= learning_rate *
+            a->array[0]->array[j]->weight[k] -= learning_rate * //HERE
                                                 (ds * new_error[j] * input[k]); //E * df * value_previous_layer
+            //if(isnan(a->array[0]->array[j]->weight[k]))
+            //    printf("Line 206 : %lf %lf %lf\n",ds,new_error[j],input[k]);
         }
     }
-
+    free(new_error);
 }
 
 long forwardpass(network* a, double* input, double learning_rate){
 
     //Input Layer
     for (int i = 0; i < a->array[0]->length; i++) {
-        a->array[0]->array[i]->value = LeakyReLU(Z(*a->array[0]->array[i], input, NULL), learning_rate);
+        a->array[0]->array[i]->value = LeakyReLU(Z(*a->array[0]->array[i], input, NULL), learning_rate); //HERE
+        if(isnan(a->array[0]->array[i]->value))
+            printf("Line 218\n");
     }
         /*for (long l = 0; l < a->array[0]->length; l++) {
 
@@ -210,7 +236,9 @@ long forwardpass(network* a, double* input, double learning_rate){
     //Hidden Layer
     for (int i = 1; i < a->length - 1; i++) { //pb i
         for (int j = 0; j < a->array[i]->length; ++j) {
-            a->array[i]->array[j]->value = LeakyReLU(Z(*a->array[i]->array[j], NULL, *a->array[i - 1]->array), learning_rate);
+            a->array[i]->array[j]->value = LeakyReLU(Z(*a->array[i]->array[j], NULL, a->array[i - 1]->array), learning_rate); //HERE
+            if(isnan(a->array[i]->array[j]->value))
+                printf("Line 235\n");
         }
 
         /*for (long l = 0; l < a->array[0]->length; l++) {
@@ -230,15 +258,17 @@ long forwardpass(network* a, double* input, double learning_rate){
     //sum for softmax
     double sum = 0;
     for (long i = 0; i < a->array[a->length-1]->length; i++) {
-        sum += exp(Z(*a->array[a->length-1]->array[i],NULL, *a->array[a->length - 2]->array));
+        sum += exp(Z(*a->array[a->length-1]->array[i],NULL, a->array[a->length - 2]->array));
     }
 
     for (long i = 0; i < a->array[a->length - 1]->length; i++) {
-        a->array[a->length - 1]->array[i]->value = softmax(Z(*a->array[a->length-1]->array[i], NULL,
-                                                            *a->array[a->length - 2]->array), sum);
+        a->array[a->length - 1]->array[i]->value = softmax(Z(*a->array[a->length-1]->array[i], NULL, //HERE
+                                                            a->array[a->length - 2]->array), sum);
+        if(isnan(a->array[a->length - 1]->array[i]->value))
+            printf("Line 262 : %lf %lf\n",sum,a->array[a->length - 1]->array[i]->value);
     }
 
-    for (long l = 0; l < a->array[a->length - 1]->length; l++) {
+    /*for (long l = 0; l < a->array[a->length - 1]->length; l++) {
 
         printf("Layer: %ld    Neurone: %ld    Value: %f\n", a->length - 1, l, a->array[a->length - 1]->array[l]->value);
         printf("Layer: %ld    Neurone: %ld    Bias: %f\n", a->length - 1, l, a->array[a->length - 1]->array[l]->bias);
@@ -246,23 +276,26 @@ long forwardpass(network* a, double* input, double learning_rate){
         for (int m = 0; m < a->array[0]->array[l]->weight_length; m++) {
             printf("Layer: %ld    Neurone: %ld    Weight: %f\n", a->length - 1, l, a->array[a->length - 1]->array[l]->weight[m]);
         }
-    }
+    }*/
 
     return getmax(a->array[a->length-1]);
 }
 
-void backwardpass(network* a, double* get, double* input, double* cost, double learning_rate){
-
-    output_backprop(a, get, cost, learning_rate);
+void backwardpass(network* a, double* get, double* input, double** cost, double learning_rate){
+    //print_array(*cost,nbONode);
+    output_backprop(a, get, *cost, learning_rate);
+    //print_array(*cost,nbONode);
     hidden_backprop(a, cost, learning_rate);
-    input_backprop(a, input, cost, learning_rate);
+    //print_array(*cost,nbHNode);
+    input_backprop(a, input, *cost, learning_rate);
+    //print_array(*cost,nbHNode);
 }
 
 void training(network* network, training_image input, long epoch, double learning_rate){
 
     for (long i = 0; i < epoch; i++) {
 
-        for (size_t j = 0; j < 2; j++) {
+        for (size_t j = 0; j < 1; j++) {
 
             //Forward
             long res = forwardpass(network, input.images[j], learning_rate);
@@ -272,19 +305,22 @@ void training(network* network, training_image input, long epoch, double learnin
             for (int k = 0; k < nbONode; k++) {
                 soft[k] = ((network->array[network->length - 1])->array[k])->value;
             }
+            //print_array(soft,10);
 
             //Calc array in tmp format
             double expected[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             expected[(int)input.labels[j]] = 1;
+            //print_array(expected,10);
 
             //Calc error
-            double* cost_array = cost(soft, (double *) expected);
+            double* cost_array = cost(soft, (double *) expected); //size = 10
             double error = average(cost_array);
             //printf("Enter: %d      Get: %ld       The margin of error: %f\n",
 		    //input.labels[j], res, error);
+            //print_array(cost_array,10);
 
             //Backward
-            backwardpass(network, soft, input.images[j], cost_array, learning_rate);
+            backwardpass(network, soft, input.images[j], &cost_array, learning_rate);
 
             free(cost_array);
         }
@@ -296,7 +332,7 @@ neuron* neuron_init(long nb_weight, long previous_layer_size){
     a->value = 0;
     a->bias = he((double) previous_layer_size);
     a->weight_length = nb_weight;
-    a->weight = malloc(sizeof(double) * nb_weight);
+    a->weight = calloc(nb_weight,sizeof(double));
     for(int k = 0; k < nb_weight; k++) {
         a->weight[k] = he((double) previous_layer_size);
     }
@@ -366,12 +402,13 @@ int neural_network(){
         a = LoadNetwork();
     else
         a = initialisation();
+    //SaveNetwork(a);
 
     srand(time(NULL));
 
     training_image* input = SetupTrainingArrays();
     training(a, *input, 1, learning_rate);
-    SaveNetwork(a);
+    //SaveNetwork(a);
     FreeTrainingArrays(input);
     free_network(a);
 

@@ -258,6 +258,11 @@ network* LoadNetwork()
 void SaveNetwork(network* net)
 {
     FILE *file = fopen(save_path,"w");
+    if(file == NULL)
+    {
+        printf("Error : saving path for neural network doesn't exist\n");
+        return;
+    }
     save_network(net,file);
     fclose(file);
 }

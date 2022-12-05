@@ -16,4 +16,6 @@ Saves the network argument to the save file.
 */
 void SaveNetwork(network* net);
 
+void print_array(double* arr,size_t size);
+
 #endif
