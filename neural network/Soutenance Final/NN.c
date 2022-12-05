@@ -18,6 +18,8 @@
 #define nbHNode 16
 #define nbONode 10
 
+#define small_constant 0.000000001
+
 double he(double previous_layer_size){
     double res = (rand()/(double)RAND_MAX) * sqrt(2/previous_layer_size);
     //printf("%lf\n",res);
@@ -75,11 +77,11 @@ double dssoftmax(double a, double partial_sum, double sum){
 double* cost(double* get, double* expected){
     double* res = malloc(sizeof(double) * nbONode);
     for (int i = 0; i < nbONode; i++) {
-        double logex = expected[i] == 0 ? 0 : log(expected[i]);
-        double lognex = expected[i] == 1 ? 0 : log(1-expected[i]);
+        double logex = expected[i] == 0 ? -INFINITY : log(expected[i]);
+        double lognex = expected[i] == 1 ? INFINITY : log(1-expected[i]);
         res[i] = -1 * (get[i] * logex)
                 + (1 - get[i]) * lognex; //TODO : fix log(0) error
-        printf("%lf %lf\n",get[i],res[i]);
+        //printf("%lf %lf\n",get[i],res[i]);
     }
 
     return res;
@@ -305,19 +307,16 @@ void training(network* network, training_image input, long epoch, double learnin
             for (int k = 0; k < nbONode; k++) {
                 soft[k] = ((network->array[network->length - 1])->array[k])->value;
             }
-            //print_array(soft,10);
 
             //Calc array in tmp format
             double expected[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             expected[(int)input.labels[j]] = 1;
-            //print_array(expected,10);
 
             //Calc error
             double* cost_array = cost(soft, (double *) expected); //size = 10
             double error = average(cost_array);
-            //printf("Enter: %d      Get: %ld       The margin of error: %f\n",
-		    //input.labels[j], res, error);
-            //print_array(cost_array,10);
+            printf("Enter: %d      Get: %ld       The margin of error: %f\n",
+		    input.labels[j], res, error);
 
             //Backward
             backwardpass(network, soft, input.images[j], &cost_array, learning_rate);
@@ -408,7 +407,7 @@ int neural_network(){
 
     training_image* input = SetupTrainingArrays();
     training(a, *input, 1, learning_rate);
-    //SaveNetwork(a);
+    SaveNetwork(a);
     FreeTrainingArrays(input);
     free_network(a);
 
