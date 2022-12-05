@@ -75,15 +75,25 @@ double dssoftmax(double a, double partial_sum, double sum){
 
 //Log Loss cost function
 double* cost(double* get, double* expected){
+    print_array(get,10);
+    print_array(expected,10);
     double* res = malloc(sizeof(double) * nbONode);
+    res[0] = 0;
     for (int i = 0; i < nbONode; i++) {
-        double logex = expected[i] == 0 ? -INFINITY : log(expected[i]);
+        /*double logex = expected[i] == 0 ? -INFINITY : log(expected[i]);
         double lognex = expected[i] == 1 ? INFINITY : log(1-expected[i]);
         res[i] = -1 * (get[i] * logex)
                 + (1 - get[i]) * lognex; //TODO : fix log(0) error
-        //printf("%lf %lf\n",get[i],res[i]);
+        //printf("%lf %lf\n",get[i],res[i]);*/
+        if(get[i] == 0)
+            get[i] = 0.00001;
+        else if(get[i] == 1)
+            get[i] = 0.99999;
+        double val = -(expected[i]*log(get[i]) + (1-expected[i])*log((1-get[i])));
+        res[i] = val;
+        //printf("%lf\n",val);
     }
-
+    //res[0] = (-1 / (double)nbONode) * res[0];
     return res;
 }
 
@@ -93,7 +103,7 @@ double average(double* a){
     for (int i = 0; i < nbONode; i++) {
         res += a[i];
     }
-    return (1/nbONode) * res;
+    return (1/(double)nbONode) * res;
 }
 
 double partial_sum(layer* a, int except){
@@ -222,8 +232,8 @@ long forwardpass(network* a, double* input, double learning_rate){
     //Input Layer
     for (int i = 0; i < a->array[0]->length; i++) {
         a->array[0]->array[i]->value = LeakyReLU(Z(*a->array[0]->array[i], input, NULL), learning_rate); //HERE
-        if(isnan(a->array[0]->array[i]->value))
-            printf("Line 218\n");
+        //if(isnan(a->array[0]->array[i]->value))
+        //    printf("Line 218\n");
     }
         /*for (long l = 0; l < a->array[0]->length; l++) {
 
@@ -239,8 +249,8 @@ long forwardpass(network* a, double* input, double learning_rate){
     for (int i = 1; i < a->length - 1; i++) { //pb i
         for (int j = 0; j < a->array[i]->length; ++j) {
             a->array[i]->array[j]->value = LeakyReLU(Z(*a->array[i]->array[j], NULL, a->array[i - 1]->array), learning_rate); //HERE
-            if(isnan(a->array[i]->array[j]->value))
-                printf("Line 235\n");
+            //if(isnan(a->array[i]->array[j]->value))
+            //    printf("Line 235\n");
         }
 
         /*for (long l = 0; l < a->array[0]->length; l++) {
@@ -266,8 +276,8 @@ long forwardpass(network* a, double* input, double learning_rate){
     for (long i = 0; i < a->array[a->length - 1]->length; i++) {
         a->array[a->length - 1]->array[i]->value = softmax(Z(*a->array[a->length-1]->array[i], NULL, //HERE
                                                             a->array[a->length - 2]->array), sum);
-        if(isnan(a->array[a->length - 1]->array[i]->value))
-            printf("Line 262 : %lf %lf\n",sum,a->array[a->length - 1]->array[i]->value);
+        //if(isnan(a->array[a->length - 1]->array[i]->value))
+        //    printf("Line 262 : %lf %lf\n",sum,a->array[a->length - 1]->array[i]->value);
     }
 
     /*for (long l = 0; l < a->array[a->length - 1]->length; l++) {
@@ -284,20 +294,16 @@ long forwardpass(network* a, double* input, double learning_rate){
 }
 
 void backwardpass(network* a, double* get, double* input, double** cost, double learning_rate){
-    //print_array(*cost,nbONode);
     output_backprop(a, get, *cost, learning_rate);
-    //print_array(*cost,nbONode);
     hidden_backprop(a, cost, learning_rate);
-    //print_array(*cost,nbHNode);
     input_backprop(a, input, *cost, learning_rate);
-    //print_array(*cost,nbHNode);
 }
 
 void training(network* network, training_image input, long epoch, double learning_rate){
 
     for (long i = 0; i < epoch; i++) {
 
-        for (size_t j = 0; j < 1; j++) {
+        for (size_t j = 0; j < 5; j++) {
 
             //Forward
             long res = forwardpass(network, input.images[j], learning_rate);
@@ -407,7 +413,7 @@ int neural_network(){
 
     training_image* input = SetupTrainingArrays();
     training(a, *input, 1, learning_rate);
-    SaveNetwork(a);
+    //SaveNetwork(a);
     FreeTrainingArrays(input);
     free_network(a);
 
