@@ -106,7 +106,6 @@ int main(int argc, char** argv)
 
     // - Create a surface from the colored image.
     SDL_Surface* s = load_image(argv[1]);
-
     // - Resize the window according to the size of the image.
     SDL_SetWindowSize(window, s->w, s->h);
     // - Create a texture from the colored surface.
@@ -114,26 +113,37 @@ int main(int argc, char** argv)
     // - Treatement Image.
 
     surface_to_grayscale(s);
+    SDL_Surface* s1 = copy_s(s);
+    IMG_SavePNG(s1, "s1.png");
     SDL_Texture* texture2 = SDL_CreateTextureFromSurface(renderer, s);
 
     change_luminosity(s);
+    SDL_Surface* s2 = copy_s(s);
+    IMG_SavePNG(s2, "s2.png");
     SDL_Texture* texture3 = SDL_CreateTextureFromSurface(renderer, s);
 
     change_contrast(s);
+    SDL_Surface* s3 = copy_s(s);
+    IMG_SavePNG(s3, "s3.png");
     SDL_Texture* texture4 = SDL_CreateTextureFromSurface(renderer, s);
 
     //flou_gaussien(s);
     SDL_Texture* texture5 = SDL_CreateTextureFromSurface(renderer, s);
 
     binarization(s,1);
+    SDL_Surface* s4 = copy_s(s);
+    IMG_SavePNG(s4, "s4.png");
     SDL_Texture* texture6 = SDL_CreateTextureFromSurface(renderer, s);
 
     white_to_black(s);
+    SDL_Surface* s5 = copy_s(s);
+    IMG_SavePNG(s5, "s5.png");
     SDL_Texture* texture7 = SDL_CreateTextureFromSurface(renderer, s);
 
     sobel(s);
+    SDL_Surface* s6 = copy_s(s);
+    IMG_SavePNG(s6, "s6.png");
     SDL_Texture* texture8 = SDL_CreateTextureFromSurface(renderer, s);
-    IMG_SavePNG(s, "out.png");
     // - Free the surface.
     SDL_FreeSurface(s);
     // - Dispatch the events.

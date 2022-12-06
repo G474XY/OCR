@@ -34,6 +34,11 @@ void surface_to_grayscale(SDL_Surface* surface)
     SDL_UnlockSurface(surface);
 }
 
+SDL_Surface * copy_s(SDL_Surface *source)
+{
+    return SDL_ConvertSurface(source, source->format,SDL_SWSURFACE);
+}
+
 float luminosity(Uint8 c, double n)
 {
     return (Uint8) (255 * SDL_pow((double) c / 255, n));
@@ -116,6 +121,7 @@ Uint32 moyenne(SDL_Surface *surface, int i, int j, int n)
 
 void flou_gaussien(SDL_Surface* surface)
 {
+    SDL_Surface* s2 = copy_s(surface);
     Uint32* pixels = surface->pixels;
     int h = surface->h;
     int w = surface->w;
@@ -123,7 +129,7 @@ void flou_gaussien(SDL_Surface* surface)
     {
         for(int j = 0; j < w; j++)
         {
-            pixels[i * w + j] = moyenne(surface, i, j, 3);
+            pixels[i * w + j] = moyenne(s2, i, j, 2);
         }
     }
 }

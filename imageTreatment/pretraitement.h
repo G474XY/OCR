@@ -6,6 +6,7 @@
 #include <SDL2/SDL_image.h>
 
 
+SDL_Surface * copy_s(SDL_Surface* source);
 Uint32 pixel_to_grayscale(Uint32 pixel_color, SDL_PixelFormat* format);
 void surface_to_grayscale(SDL_Surface* surface);
 Uint32 moyenne(SDL_Surface *surface, int i, int j, int n);
