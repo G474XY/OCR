@@ -2,6 +2,8 @@
 #include <string.h>
 #include "saver.h"
 
+#define grid_size 9
+
 void clear_array(char grid[],int length)
 {
     for(int i = 0; i < length; i++)

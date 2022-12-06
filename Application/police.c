@@ -37,14 +37,18 @@ GdkPixbuf* resize_img_from_path(char* path)
 
 int main()
 {
-    char path[100];
-    for(int i = 0; i < 10; i++)
+    //char path[100];
+    /*for(int i = 0; i < 10; i++)
     {
         GError* err = NULL;
         snprintf(path,100,"images/%d.png",i);
         GdkPixbuf* img = resize_img_from_path(path);
         snprintf(path,100,"images/%d_r.png",i);
         gdk_pixbuf_save(img,path,"png",&err);
-    }
+    }*/
     //resize_img_from_path("images/02.png");
+    //GError* err = NULL;
+    //GdkPixbuf* img = resize_img_from_path("images/0.png");
+    //gdk_pixbuf_save(img,"images/0_r.png","png",&err);
+    return 0;
 }
