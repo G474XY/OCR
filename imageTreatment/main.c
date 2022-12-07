@@ -3,7 +3,7 @@
 #include <SDL2/SDL_image.h>
 
 #include "pretraitement.h"
-#include "detect_grid.h"
+//#include "detect_grid.h"
 
 // Updates the display.
 //

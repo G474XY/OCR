@@ -29,6 +29,11 @@ const char* unsolvable_message =
     "Note : this can be a malencontrous problem from our end.\n"
     "If you are not sure, you can always try again.";
 
+
+//========================================
+
+//============STRUCT FUNCTIONS============
+
 typedef struct UI
 {
     GtkImage* image;
@@ -63,6 +68,17 @@ typedef struct Data
     int state;
     int max_state;
 } Data;
+
+void set_active_start_button(Data* data,gboolean active)
+{
+    gtk_widget_set_sensitive(GTK_WIDGET(data->ui.start_button),active);
+}
+
+void set_active_cycle_buttons(Data* data,gboolean active)
+{
+    gtk_widget_set_sensitive(GTK_WIDGET(data->ui.cycle_left),active);
+    gtk_widget_set_sensitive(GTK_WIDGET(data->ui.cycle_right),active);
+}
 
 //========================================
 
@@ -268,6 +284,36 @@ char change_image(Data* data,Image* image_to_change)
     return 0;
 }
 
+void cycle_images(Data* data,int delta)
+{
+    int newstate = data->state + delta;
+    if(newstate < 0 || newstate > data->max_state)
+        return;
+    
+    data->state = newstate;
+    
+    GdkPixbuf* pixbuf = NULL;
+    switch (newstate)
+    {
+    case 0:
+        pixbuf = data->images.loaded_image.image;
+        break;
+    case unsolved_state:
+        pixbuf = data->images.initial_sudoku.image;
+        break;
+    case solved_state:
+        pixbuf = data->images.solved_sudoku.image;
+        break;
+    
+    default:
+        break;
+    }
+    if(pixbuf != NULL)
+    {
+        gtk_image_set_from_pixbuf(data->ui.image,pixbuf);
+    }
+}
+
 //========================================
 
 //===========LINKING FUNCTIONS============
@@ -321,52 +367,12 @@ void solve_sudoku(Data* data,char* grid)
     }
 }
 
-void cycle_images(Data* data,int delta)
-{
-    printf("%d\n",data->max_state);
-    int newstate = data->state + delta;
-    if(newstate < 0 || newstate > data->max_state)
-        return;
-    
-    data->state = newstate;
-    
-    GdkPixbuf* pixbuf = NULL;
-    switch (newstate)
-    {
-    case 0:
-        pixbuf = data->images.loaded_image.image;
-        break;
-    case unsolved_state:
-        pixbuf = data->images.initial_sudoku.image;
-        break;
-    case solved_state:
-        pixbuf = data->images.solved_sudoku.image;
-        break;
-    
-    default:
-        break;
-    }
-    if(pixbuf != NULL)
-    {
-        gtk_image_set_from_pixbuf(data->ui.image,pixbuf);
-    }
-}
-
 //========================================
 
 //===========SIGNAL FUNCTIONS=============
 
 void on_start(GtkButton* button,gpointer user_data)
 {
-    /*g_print("%sInitializing processing...\n",term_pref);
-    g_print("%sRetrieving image...\n",term_pref);
-    g_print("%sApplying pre-processing on image...\n",term_pref);
-    g_print("%sDetecting grid...\n",term_pref);
-    g_print("%sSending found images to neural network...\n",term_pref);
-    g_print("%sSolving found sudoku grid...\n",term_pref);
-    g_print("%sRendering solved grid...\n",term_pref);
-    g_print("%sEnding processing...\n",term_pref);
-    */
     Data* data = user_data;
 
     pre_traitement(data);
@@ -378,6 +384,8 @@ void on_start(GtkButton* button,gpointer user_data)
     loadSudoku("../solver/solvable/s00.oku",grid); //TODO
     solve_sudoku(data,grid);
     free(grid);
+    set_active_start_button(data,FALSE);
+    set_active_cycle_buttons(data,TRUE);
 
     if(button || user_data)
         return;
@@ -386,12 +394,19 @@ void on_start(GtkButton* button,gpointer user_data)
 void on_load_file(GtkFileChooserButton* button,gpointer user_data)
 {
     Data *data = user_data;
+
+    set_active_cycle_buttons(data,FALSE);
+    data->max_state = 0;
+    data->state = 0;
+
     char* path = gtk_file_chooser_get_filename(
         GTK_FILE_CHOOSER(data->ui.load_button));
     data->images.loaded_image.path = path;
     g_print("%sLoading image at path %s\n",term_pref,path);
-     if(change_image(data,&(data->images.loaded_image))) //Error
+    if(change_image(data,&(data->images.loaded_image))) //Error
         data->images.loaded_image.path = NULL;
+    else
+        gtk_widget_set_sensitive(GTK_WIDGET(data->ui.start_button),TRUE);
     
     if(button)
         return;
@@ -400,7 +415,6 @@ void on_load_file(GtkFileChooserButton* button,gpointer user_data)
 void on_cycle_left(GtkButton* button,gpointer user_data)
 {
     Data* data = user_data;
-    printf("left\n");
     cycle_images(data,-1);
     if(button)
         return;
@@ -409,7 +423,6 @@ void on_cycle_left(GtkButton* button,gpointer user_data)
 void on_cycle_right(GtkButton* button,gpointer user_data)
 {
     Data* data = user_data;
-    printf("right\n");
     cycle_images(data,1);
     if(button)
         return;
@@ -432,12 +445,14 @@ int main()
     }
     GtkWindow* window = GTK_WINDOW(gtk_builder_get_object(builder,"ocr.window"));
     GtkButton* button = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.solvebutton"));
-    //GtkPaned* paned = GTK_PANED(gtk_builder_get_object(builder,"ocr.paned"));
+    gtk_widget_set_sensitive(GTK_WIDGET(button),FALSE);
     GtkFileChooserButton* loadbutton = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder,"ocr.loadfile"));
     GtkButton* savebutton = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.save"));
     gtk_widget_set_sensitive(GTK_WIDGET(savebutton),FALSE);
     GtkButton* cycleleft = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.cycleleft"));
     GtkButton* cycleright = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.cycleright"));
+    gtk_widget_set_sensitive(GTK_WIDGET(cycleleft),FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(cycleright),FALSE);
 
     GtkFixed* fixed = GTK_FIXED(gtk_builder_get_object(builder,"ocr.fixed"));
 
