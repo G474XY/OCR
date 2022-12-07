@@ -8,14 +8,14 @@ LDLIBS = `pkg-config --libs sdl2 SDL2_image` -lm
 
 all: main
 
-SRC = pretraitement.c detect_grid.c main.c
+SRC = pretraitement.c main.c
 all: pretraitement main rotate
 
 SRC = pretraitement.c main.c rotate.c hough.c
 OBJ = ${SRC:.c=.o}
 EXE = ${SRC:.c=}
 
-main: main.o pretraitement.o detect_grid.o
+main: main.o pretraitement.o
 
 rotate: rotate.o hough.o
 
