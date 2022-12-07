@@ -2,7 +2,7 @@
 
 CC = gcc
 CPPFLAGS =
-CFLAGS = -Wall -Wextra -g  -fsanitize=leak `pkg-config --cflags sdl2 SDL2_image`
+CFLAGS = -Wall -Wextra -g  -Wuninitialized -fsanitize=leak `pkg-config --cflags sdl2 SDL2_image`
 LDFLAGS =
 LDLIBS = `pkg-config --libs sdl2 SDL2_image` -lm
 

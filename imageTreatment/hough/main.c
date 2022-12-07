@@ -97,8 +97,22 @@ int main(int argc, char** argv)
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, s);
 	SDL_SetWindowSize(window, s->w, s->h);
 	int i =0;
-	double *m = hough(s, &i);
-	struct coordonate *m2 = coor(m, &i);
+	int rho =0;
+	int theta = 0;
+	int *m3;
+	double *m = hough(s, &i, &rho, &theta, &m3);
+	//printf("%d\n", m3[1000]);
+
+	//struct poss *poss = analysise(m3, rho, theta, 2000);
+
+	//double **positions = NULL;
+	int *result = NULL;
+
+	//double *positions = analyse(m3, 1200, &i, result, rho, theta);
+
+	//printf("%f\n", positions[0]);
+
+	struct coordonate *m2 = coor(m, &i, s);
 
 	//printf("%d\n", i);
 
@@ -117,6 +131,7 @@ int main(int argc, char** argv)
 
 	free(m);
 	free(m2);
+	free(m3);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 
