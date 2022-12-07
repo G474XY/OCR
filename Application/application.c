@@ -6,12 +6,17 @@
 const size_t grid_size_squared = grid_size * grid_size;
 #define square_size 28
 
-#define line_width 5
+#define line_width 3
 #define line_color 0
 #define color_channels 4
+#define color_switch_threshold 100
 
 #define h_margin 80
 #define v_margin 50
+
+#define unsolved_state 1
+#define solved_state 2
+
 #define term_pref "[OCR-du-turfu_1.1.4] "
 
 const char* err_message = 
@@ -27,19 +32,41 @@ const char* unsolvable_message =
 typedef struct UI
 {
     GtkImage* image;
-    char* image_path;
+    //char* image_path;
     GtkWindow* window;
     GtkFixed* fixed;
     GtkButton* start_button;
     GtkFileChooserButton* load_button;
+    GtkButton* save_button;
+    GtkButton* cycle_left;
+    GtkButton* cycle_right;
 } UI;
+
+typedef struct Image
+{
+    char* path;
+    GdkPixbuf* image;
+} Image;
+
+typedef struct Images
+{
+    Image loaded_image;
+    Image initial_sudoku;
+    Image solved_sudoku;
+} Images;
 
 typedef struct Data
 {
     guchar** number_images;
-    int current_number;
     UI ui;
+    Images images;
+    int state;
+    int max_state;
 } Data;
+
+//========================================
+
+//============IMAGE FUNCTIONS=============
 
 guchar** load_number_images()
 {
@@ -56,8 +83,7 @@ guchar** load_number_images()
     for(int i = 0; i <= grid_size; i++)
     {
         guchar* tmp = res[i];
-        snprintf(path_buff,30,"images/%d.png\0",i);
-        printf("%s\n",path_buff);
+        snprintf(path_buff,30,"images/%d.png",i);
         pix = gdk_pixbuf_new_from_file_at_scale(path_buff,square_size,square_size,FALSE,&err);
         guchar* pixels = gdk_pixbuf_get_pixels(pix);
         for(size_t j = 0; j < image_size; j++)
@@ -101,9 +127,9 @@ void put_pixel_grayscale(guchar* pixel,guchar gray_value)
 
 void put_pixel_newnumber(guchar* pixel)
 {
-    pixel[0] = 0;
-    pixel[1] = 0;
-    pixel[2] = 180;
+    pixel[0] = 56;
+    pixel[1] = 216;
+    pixel[2] = 75;
     pixel[3] = 255;
 }
 
@@ -130,11 +156,9 @@ size_t draw_lines(guchar* pixels,size_t start,size_t len,size_t num_lines)
     return j;
 }
 
-GdkPixbuf* sudoku_to_image(char* sudoku,guchar** number_images)
+GdkPixbuf* sudoku_to_image(char* initialsudoku,char* solvedsudoku,guchar** number_images)
 {
     size_t size = grid_size * square_size + (grid_size + 1) * line_width;
-    //size_t size_bytes = size * color_channels;
-    size_t size_squared = size * size;
 
     GdkPixbuf* pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB,
         TRUE,
@@ -148,26 +172,34 @@ GdkPixbuf* sudoku_to_image(char* sudoku,guchar** number_images)
     size_t counter = 0;
     size_t square_counter = 0;
     size_t tmp_square_counter = 0;
-    int line_count = 0;
+    char* pix_grid = solvedsudoku == NULL ? initialsudoku : solvedsudoku;
     for(int i = 0; i < grid_size; i++) //9x
     {
         counter = draw_lines(pixels,counter,size,line_width);
         for(int j = 0; j < square_size; j++)
         {
             tmp_square_counter = square_counter;
-            size_t test = counter;
             for(int k = 0; k < grid_size; k++)
             {
                 counter = draw_line(pixels,counter,line_width);
                 for(int l = 0; l < square_size; l++)
                 {
                     unsigned int pix_val = get_grayscale(
-                        number_images[sudoku[tmp_square_counter]] + (l + j * square_size) * color_channels);
-                    //put_pixel_grayscale(pixels + counter,pix_val);
-                    if(pix_val > 100 || sudoku[tmp_square_counter] == 0)
-                        put_pixel_grayscale(pixels + counter,255);
+                        number_images[(int)pix_grid[tmp_square_counter]] + (l + j * square_size) * color_channels);
+                    if(solvedsudoku != NULL && initialsudoku[tmp_square_counter] == 0)
+                    {
+                        if(pix_val > color_switch_threshold)
+                            put_pixel_grayscale(pixels + counter,255);
+                        else
+                            put_pixel_newnumber(pixels + counter);
+                    }
                     else
-                        put_pixel_grayscale(pixels + counter,pix_val);
+                    {
+                        if(pix_val >= color_switch_threshold || initialsudoku[tmp_square_counter] == 0)
+                            put_pixel_grayscale(pixels + counter,255);
+                        else
+                            put_pixel_grayscale(pixels + counter,0);
+                    }
                     counter += color_channels;
                 }
                 tmp_square_counter += 1;
@@ -213,52 +245,27 @@ void resize_image(Data* data,GdkPixbuf** image)
     *image = gdk_pixbuf_scale_simple(*image,width,height,GDK_INTERP_BILINEAR);
 }
 
-char change_image(Data* data,char* path)
+char change_image(Data* data,Image* image_to_change)
 {
     GError** error = NULL;
     
-    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(path,error);
-    if(pixbuf == NULL)
+    if(image_to_change->image == NULL)
     {
-        g_print("%sWarning : the specified path is not an image!\n",term_pref);
-        return 1; //Error
+        GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(image_to_change->path,error);
+        if(pixbuf == NULL)
+        {
+            g_print("%sWarning : the specified path is not an image!\n",term_pref);
+            return 1; //Error
+        }
+
+        resize_image(data,&pixbuf);
+
+        image_to_change->image = pixbuf;
     }
-
-    resize_image(data,&pixbuf);
-
-    gtk_image_set_from_pixbuf(data->ui.image,pixbuf);
+    gtk_image_set_from_pixbuf(data->ui.image,image_to_change->image);
 
     //gtk_image_set_from_file(oldimage,path);
     return 0;
-}
-
-void on_load_file(GtkFileChooserButton* button,gpointer user_data)
-{
-    Data *data = user_data;
-    char* path = gtk_file_chooser_get_filename(
-        GTK_FILE_CHOOSER(data->ui.load_button));
-    data->ui.image_path = path;
-    g_print("%sLoading image at path %s\n",term_pref,path);
-    if(change_image(data,path))
-        data->ui.image_path = NULL;
-}
-
-void pop_window(Data* data,const char* message)
-{
-    GtkWidget* message_window = gtk_message_dialog_new_with_markup(
-        data->ui.window,
-        GTK_DIALOG_DESTROY_WITH_PARENT,
-        GTK_MESSAGE_ERROR,
-        GTK_BUTTONS_CLOSE,
-        "<span weight=\"ultrabold\">Warning :\n</span>%s",
-        message
-    );
-
-    GtkDialog* dialog_window = GTK_DIALOG(message_window);
-
-    //gtk_dialog_add_buttons(dialog_window,"OK",NULL); //segfault
-    gtk_dialog_run(dialog_window);
-    gtk_widget_destroy(message_window);
 }
 
 //========================================
@@ -267,7 +274,7 @@ void pop_window(Data* data,const char* message)
 
 char pre_traitement(Data* data)
 {
-    if(data->ui.image_path == NULL)
+    if(data->images.loaded_image.path == NULL)
     {
         return 1; //Error
     }
@@ -286,12 +293,68 @@ void get_grid_from_nn()
 
 }
 
-void solve_sudoku()
+void solve_sudoku(Data* data,char* grid)
 {
-    //solveSudoku(grid);
+    if(data->number_images == NULL)
+        data->number_images = load_number_images();
+
+    char grid_not_solved[grid_size_squared];
+    for(size_t i = 0; i < grid_size_squared; i++)
+    {
+        grid_not_solved[i] = grid[i];
+    }
+    GdkPixbuf* sudoku_image_notsolved = sudoku_to_image(
+        grid_not_solved,NULL,data->number_images);
+    resize_image(data,&sudoku_image_notsolved);
+    data->images.initial_sudoku.image = sudoku_image_notsolved;
+
+    data->max_state = unsolved_state;
+    int res = solveSudoku(grid);
+    if(res != 0)
+    {
+        data->max_state = solved_state;
+        GdkPixbuf* sudoku_image_solved = sudoku_to_image(
+        grid_not_solved,grid,data->number_images);
+        resize_image(data,&sudoku_image_solved);
+        data->images.solved_sudoku.image = sudoku_image_solved;
+        //gtk_image_set_from_pixbuf(data->ui.image,sudoku_image_solved); //TODO
+    }
+}
+
+void cycle_images(Data* data,int delta)
+{
+    printf("%d\n",data->max_state);
+    int newstate = data->state + delta;
+    if(newstate < 0 || newstate > data->max_state)
+        return;
+    
+    data->state = newstate;
+    
+    GdkPixbuf* pixbuf = NULL;
+    switch (newstate)
+    {
+    case 0:
+        pixbuf = data->images.loaded_image.image;
+        break;
+    case unsolved_state:
+        pixbuf = data->images.initial_sudoku.image;
+        break;
+    case solved_state:
+        pixbuf = data->images.solved_sudoku.image;
+        break;
+    
+    default:
+        break;
+    }
+    if(pixbuf != NULL)
+    {
+        gtk_image_set_from_pixbuf(data->ui.image,pixbuf);
+    }
 }
 
 //========================================
+
+//===========SIGNAL FUNCTIONS=============
 
 void on_start(GtkButton* button,gpointer user_data)
 {
@@ -309,21 +372,51 @@ void on_start(GtkButton* button,gpointer user_data)
     pre_traitement(data);
     get_grid();
     get_grid_from_nn();
-    solve_sudoku();
 
-    //pop_window(data,unsolvable_message);
-
-    if(data->number_images == NULL)
-        data->number_images = load_number_images();
-
-
-    char grid[grid_size_squared];
-    loadSudoku("../solver/solvable/s00.oku",grid);
-    gtk_image_set_from_pixbuf(data->ui.image,sudoku_to_image(grid,data->number_images));
+    
+    char* grid = calloc(grid_size_squared,sizeof(char)); //TODO
+    loadSudoku("../solver/solvable/s00.oku",grid); //TODO
+    solve_sudoku(data,grid);
+    free(grid);
 
     if(button || user_data)
         return;
 }
+
+void on_load_file(GtkFileChooserButton* button,gpointer user_data)
+{
+    Data *data = user_data;
+    char* path = gtk_file_chooser_get_filename(
+        GTK_FILE_CHOOSER(data->ui.load_button));
+    data->images.loaded_image.path = path;
+    g_print("%sLoading image at path %s\n",term_pref,path);
+     if(change_image(data,&(data->images.loaded_image))) //Error
+        data->images.loaded_image.path = NULL;
+    
+    if(button)
+        return;
+}
+
+void on_cycle_left(GtkButton* button,gpointer user_data)
+{
+    Data* data = user_data;
+    printf("left\n");
+    cycle_images(data,-1);
+    if(button)
+        return;
+}
+
+void on_cycle_right(GtkButton* button,gpointer user_data)
+{
+    Data* data = user_data;
+    printf("right\n");
+    cycle_images(data,1);
+    if(button)
+        return;
+}
+
+
+//========================================
 
 
 int main()
@@ -341,6 +434,11 @@ int main()
     GtkButton* button = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.solvebutton"));
     //GtkPaned* paned = GTK_PANED(gtk_builder_get_object(builder,"ocr.paned"));
     GtkFileChooserButton* loadbutton = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder,"ocr.loadfile"));
+    GtkButton* savebutton = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.save"));
+    gtk_widget_set_sensitive(GTK_WIDGET(savebutton),FALSE);
+    GtkButton* cycleleft = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.cycleleft"));
+    GtkButton* cycleright = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.cycleright"));
+
     GtkFixed* fixed = GTK_FIXED(gtk_builder_get_object(builder,"ocr.fixed"));
 
     GtkWidget* image = GTK_WIDGET(gtk_builder_get_object(builder,"ocr.image"));
@@ -348,26 +446,33 @@ int main()
     Data data = 
     {
         .number_images = NULL,
-        .current_number = 0,
+        .max_state = 0,
+        .state = 0,
         .ui = 
         {
             .image = GTK_IMAGE(image),
-            .image_path = NULL,
             .window = window,
             .fixed = fixed,
             .start_button = button,
-            .load_button = loadbutton
+            .load_button = loadbutton,
+            .save_button = savebutton,
+            .cycle_left = cycleleft,
+            .cycle_right = cycleright
+        },
+        .images =
+        {
+            .loaded_image = {NULL,NULL},
+            .solved_sudoku = {"not_solved.png",NULL},
+            .initial_sudoku = {"solved.png",NULL}
         }
     };
 
-    GdkPixbuf* pix = gdk_pixbuf_new_from_file("images/1_r.png",&error);
-    gtk_image_set_from_pixbuf(data.ui.image,pix);
-
     g_signal_connect(window,"destroy",G_CALLBACK(gtk_main_quit),NULL);
     g_signal_connect(button,"clicked",G_CALLBACK(on_start),&data);
+    g_signal_connect(cycleleft,"clicked",G_CALLBACK(on_cycle_left),&data);
+    g_signal_connect(cycleright,"clicked",G_CALLBACK(on_cycle_right),&data);
     g_signal_connect(loadbutton,"file-set",G_CALLBACK(on_load_file),&data);
     //g_signal_connect(window,"configure-event",G_CALLBACK(on_configure),&data);
-
     gtk_main();
 
     free_number_images(data.number_images);
