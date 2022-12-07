@@ -4,12 +4,13 @@
 
 #define grid_size 9 //todo
 const size_t grid_size_squared = grid_size * grid_size;
-#define square_size 28
+#define square_size 56
 
 #define line_width 3
 #define line_color 0
 #define color_channels 4
 #define color_switch_threshold 100
+#define save_image_size 420
 
 #define h_margin 80
 #define v_margin 50
@@ -18,6 +19,9 @@ const size_t grid_size_squared = grid_size * grid_size;
 #define solved_state 2
 
 #define term_pref "[OCR-du-turfu_1.1.4] "
+
+const char* solved_path = "solved.png";
+const char* unsolved_path = "unsolved.png";
 
 const char* err_message = 
     "There was an issue with the treatment of "
@@ -78,6 +82,11 @@ void set_active_cycle_buttons(Data* data,gboolean active)
 {
     gtk_widget_set_sensitive(GTK_WIDGET(data->ui.cycle_left),active);
     gtk_widget_set_sensitive(GTK_WIDGET(data->ui.cycle_right),active);
+}
+
+void set_active_save_button(Data* data,gboolean active)
+{
+    gtk_widget_set_sensitive(GTK_WIDGET(data->ui.save_button),active);
 }
 
 //========================================
@@ -265,19 +274,19 @@ char change_image(Data* data,Image* image_to_change)
 {
     GError** error = NULL;
     
-    if(image_to_change->image == NULL)
+    //if(image_to_change->image == NULL || 1)
+    //{
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(image_to_change->path,error);
+    if(pixbuf == NULL)
     {
-        GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(image_to_change->path,error);
-        if(pixbuf == NULL)
-        {
-            g_print("%sWarning : the specified path is not an image!\n",term_pref);
-            return 1; //Error
-        }
-
-        resize_image(data,&pixbuf);
-
-        image_to_change->image = pixbuf;
+        g_print("%sWarning : the specified path is not an image!\n",term_pref);
+        return 1; //Error
     }
+
+    resize_image(data,&pixbuf);
+
+    image_to_change->image = pixbuf;
+    //}
     gtk_image_set_from_pixbuf(data->ui.image,image_to_change->image);
 
     //gtk_image_set_from_file(oldimage,path);
@@ -365,6 +374,13 @@ void solve_sudoku(Data* data,char* grid)
         data->images.solved_sudoku.image = sudoku_image_solved;
         //gtk_image_set_from_pixbuf(data->ui.image,sudoku_image_solved); //TODO
     }
+    else
+    {
+        data->images.solved_sudoku.image = NULL;
+        data->images.solved_sudoku.path = NULL;
+    }
+    
+    set_active_save_button(data,TRUE);
 }
 
 //========================================
@@ -396,6 +412,7 @@ void on_load_file(GtkFileChooserButton* button,gpointer user_data)
     Data *data = user_data;
 
     set_active_cycle_buttons(data,FALSE);
+    set_active_save_button(data,FALSE);
     data->max_state = 0;
     data->state = 0;
 
@@ -428,6 +445,38 @@ void on_cycle_right(GtkButton* button,gpointer user_data)
         return;
 }
 
+void on_save(GtkButton* button,gpointer user_data)
+{
+    Data* data = user_data;
+    GError* err = NULL;
+    if(data->images.solved_sudoku.image != NULL)
+    {
+        GdkPixbuf* resized_image = gdk_pixbuf_scale_simple(
+            data->images.solved_sudoku.image,save_image_size,save_image_size,
+            GDK_INTERP_BILINEAR);
+        gdk_pixbuf_save(resized_image,solved_path,"png",&err,NULL);
+        g_print("%sSaved grid (solved) to %s\n",term_pref,solved_path);
+    }
+    else
+    {
+        GdkPixbuf* resized_image = gdk_pixbuf_scale_simple(
+            data->images.initial_sudoku.image,save_image_size,save_image_size,
+            GDK_INTERP_BILINEAR);
+        gdk_pixbuf_save(resized_image,unsolved_path,"png",&err,NULL);
+        g_print("%sSaved grid (not solved) to %s\n",term_pref,unsolved_path);
+    }
+
+    if(button)
+        return;
+}
+/*
+grayscale
+lighting / luminosité ++
+réduction du contraste
+binarisation
+inverser les couleurs : chiffres blancs fond noir
+sobel (philtre) : mise en avant des contours (lignes)
+*/
 
 //========================================
 
@@ -487,6 +536,7 @@ int main()
     g_signal_connect(cycleleft,"clicked",G_CALLBACK(on_cycle_left),&data);
     g_signal_connect(cycleright,"clicked",G_CALLBACK(on_cycle_right),&data);
     g_signal_connect(loadbutton,"file-set",G_CALLBACK(on_load_file),&data);
+    g_signal_connect(savebutton,"clicked",G_CALLBACK(on_save),&data);
     //g_signal_connect(window,"configure-event",G_CALLBACK(on_configure),&data);
     gtk_main();
 
