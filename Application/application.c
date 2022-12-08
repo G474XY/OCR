@@ -574,7 +574,6 @@ void on_rotate(GtkButton* button,gpointer user_data)
     Data* data = user_data;
 
     double angle = gtk_range_get_value(data->ui.scale);
-    g_print("%lf\n",angle);
 
     rotate_image(data->images.sobel.path,angle);
     data->images.sobel.image = load_and_resize(data,rotated_path);
