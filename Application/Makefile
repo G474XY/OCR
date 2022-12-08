@@ -8,6 +8,7 @@ SRC = application.c ../solver/solver.c ../solver/saver.c ../imageTreatment/apply
 SRC2 = police.c
 EXE = main
 
+all: application
 
 application:
 	${CC} ${CFLAGS} ${SRC} -o ${EXE} ${LDLIBS} 
