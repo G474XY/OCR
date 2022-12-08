@@ -56,3 +56,21 @@ void load_image(const char* path)
     SDL_FreeSurface(s5);
     SDL_FreeSurface(s6);
 }
+
+void rotate_image(const char* path, double angle)
+{
+    SDL_Surface* tmp = IMG_Load(path);
+    if (tmp == NULL)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
+    SDL_Surface* s = SDL_ConvertSurfaceFormat(tmp, SDL_PIXELFORMAT_RGB888, 0);
+    if (s == NULL)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
+
+    SDL_FreeSurface(tmp);
+
+    SDL_Surface* new = rotate(s, angle);
+    IMG_SavePNG(new, "tmp/rotated.png");
+
+    SDL_FreeSurface(s);
+    SDL_FreeSurface(new);
+}

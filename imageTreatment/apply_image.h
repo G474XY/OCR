@@ -1,3 +1,5 @@
+
+
 # ifndef _PRETRAITEMENT_H
 # define _PRETRAITEMENT_H
 
@@ -14,5 +16,7 @@
 
 
 void load_image(const char* path);
+void rotate_image(const char* path, double angle);
 
 # endif
+
