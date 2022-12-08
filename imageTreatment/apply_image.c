@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+//#include "apply_image.h"
 #include "pretraitement.h"
 //#include "detect_grid.h"
 
@@ -24,28 +25,34 @@ void load_image(const char* path)
 
     surface_to_grayscale(s);
     SDL_Surface* s1 = copy_s(s);
-    IMG_SavePNG(s1, "s1.png");
+    IMG_SavePNG(s1, "tmp/s1.png");
 
     change_luminosity(s);
     SDL_Surface* s2 = copy_s(s);
-    IMG_SavePNG(s2, "s2.png");
+    IMG_SavePNG(s2, "tmp/s2.png");
 
 
     change_contrast(s);
     SDL_Surface* s3 = copy_s(s);
-    IMG_SavePNG(s3, "s3.png");
+    IMG_SavePNG(s3, "tmp/s3.png");
 
     binarization(s,1);
     SDL_Surface* s4 = copy_s(s);
-    IMG_SavePNG(s4, "s4.png");
+    IMG_SavePNG(s4, "tmp/s4.png");
 
     white_to_black(s);
     SDL_Surface* s5 = copy_s(s);
-    IMG_SavePNG(s5, "s5.png");
+    IMG_SavePNG(s5, "tmp/s5.png");
 
     sobel(s);
     SDL_Surface* s6 = copy_s(s);
-    IMG_SavePNG(s6, "s6.png");
+    IMG_SavePNG(s6, "tmp/s6.png");
     // - Free the surface.
     SDL_FreeSurface(s);
+    SDL_FreeSurface(s1);
+    SDL_FreeSurface(s2);
+    SDL_FreeSurface(s3);
+    SDL_FreeSurface(s4);
+    SDL_FreeSurface(s5);
+    SDL_FreeSurface(s6);
 }

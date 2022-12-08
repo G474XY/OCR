@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include "../solver/solver.h"
+#include "../imageTreatment/apply_image.h"
 
 #define grid_size 9 //todo
 const size_t grid_size_squared = grid_size * grid_size;
@@ -15,10 +16,18 @@ const size_t grid_size_squared = grid_size * grid_size;
 #define h_margin 80
 #define v_margin 50
 
-#define unsolved_state 1
-#define solved_state 2
+#define grayscale_state 1
+#define lighting_state 2
+#define contrast_state 3
+#define binarisation_state 4
+#define invert_state 5
+#define sobel_state 6
+#define unsolved_state 7
+#define solved_state 8
 
-#define term_pref "[OCR-du-turfu_1.1.4] "
+#define loaded_it_folder "../imageTreatment/"
+
+#define term_pref "[OCR-du-turfu_1.0.0] "
 
 const char* solved_path = "solved.png";
 const char* unsolved_path = "unsolved.png";
@@ -60,6 +69,12 @@ typedef struct Image
 typedef struct Images
 {
     Image loaded_image;
+    Image grayscale;
+    Image lighting;
+    Image contrast;
+    Image binarisation;
+    Image invert;
+    Image sobel;
     Image initial_sudoku;
     Image solved_sudoku;
 } Images;
@@ -92,8 +107,6 @@ void set_active_save_button(Data* data,gboolean active)
 //========================================
 
 //============IMAGE FUNCTIONS=============
-
-
 
 guchar** load_number_images()
 {
@@ -295,6 +308,55 @@ char change_image(Data* data,Image* image_to_change)
     return 0;
 }
 
+GdkPixbuf* load_and_resize(Data* data,char* path)
+{
+    GError* err = NULL;
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(path,&err);
+    if(pixbuf == NULL)
+    {
+        printf("%s%s\n",term_pref,err->message);
+        return NULL;
+    }
+    resize_image(data,&pixbuf);
+    return pixbuf;
+}
+
+void load_it_images(Data* data)
+{
+    //Executes only if there is an image to compute
+
+    mkdir("tmp");
+    load_image(data->images.loaded_image.path);
+    
+    data->images.grayscale.path = grayscale_path;
+    data->images.grayscale.image = load_and_resize(data,grayscale_path);
+
+    data->images.lighting.path = lighting_path;
+    data->images.lighting.image = load_and_resize(data,lighting_path);
+
+    data->images.contrast.path = contrast_path;
+    data->images.contrast.image = load_and_resize(data,contrast_path);
+
+    data->images.binarisation.path = binarisation_path;
+    data->images.binarisation.image = load_and_resize(data,binarisation_path);
+
+    data->images.invert.path = invert_path;
+    data->images.invert.image = load_and_resize(data,invert_path);
+
+    data->images.sobel.path = sobel_path;
+    data->images.sobel.image = load_and_resize(data,sobel_path);
+}
+
+void remove_it_images()
+{
+    remove(grayscale_path);
+    remove(lighting_path);
+    remove(contrast_path);
+    remove(binarisation_path);
+    remove(invert_path);
+    remove(sobel_path);
+}
+
 void cycle_images(Data* data,int delta)
 {
     int newstate = data->state + delta;
@@ -311,6 +373,24 @@ void cycle_images(Data* data,int delta)
     case 0:
         pixbuf = data->images.loaded_image.image;
         gtk_widget_set_sensitive(GTK_WIDGET(data->ui.cycle_left),FALSE);
+        break;
+    case grayscale_state:
+        pixbuf = data->images.grayscale.image;
+        break;
+    case lighting_state:
+        pixbuf = data->images.lighting.image;
+        break;
+    case contrast_state:
+        pixbuf = data->images.contrast.image;
+        break;
+    case binarisation_state:
+        pixbuf = data->images.binarisation.image;
+        break;
+    case invert_state:
+        pixbuf = data->images.invert.image;
+        break;
+    case sobel_state:
+        pixbuf = data->images.sobel.image;
         break;
     case unsolved_state:
         pixbuf = data->images.initial_sudoku.image;
@@ -329,6 +409,7 @@ void cycle_images(Data* data,int delta)
     }
 }
 
+
 //========================================
 
 //===========LINKING FUNCTIONS============
@@ -340,6 +421,8 @@ char pre_traitement(Data* data)
         return 1; //Error
     }
 
+    load_it_images(data);
+    remove_it_images();
 
     return 0;
 }
@@ -455,34 +538,28 @@ void on_save(GtkButton* button,gpointer user_data)
 {
     Data* data = user_data;
     GError* err = NULL;
+
+    GdkPixbuf* to_save = NULL;
+    char* solved_or_not = NULL;
     if(data->images.solved_sudoku.image != NULL)
     {
-        GdkPixbuf* resized_image = gdk_pixbuf_scale_simple(
-            data->images.solved_sudoku.image,save_image_size,save_image_size,
-            GDK_INTERP_BILINEAR);
-        gdk_pixbuf_save(resized_image,solved_path,"png",&err,NULL);
-        g_print("%sSaved grid (solved) to %s\n",term_pref,solved_path);
+        to_save = data->images.solved_sudoku.image;
+        solved_or_not = "solved";
     }
     else
     {
-        GdkPixbuf* resized_image = gdk_pixbuf_scale_simple(
-            data->images.initial_sudoku.image,save_image_size,save_image_size,
-            GDK_INTERP_BILINEAR);
-        gdk_pixbuf_save(resized_image,unsolved_path,"png",&err,NULL);
-        g_print("%sSaved grid (not solved) to %s\n",term_pref,unsolved_path);
+        to_save = data->images.initial_sudoku.image;
+        solved_or_not = "unsolved";
     }
+    GdkPixbuf* resized_image = gdk_pixbuf_scale_simple(
+            to_save,save_image_size,save_image_size,
+            GDK_INTERP_BILINEAR);
+    gdk_pixbuf_save(resized_image,solved_path,"png",&err,NULL);
+    printf("%sSaved %s grid to %s\n",term_pref,solved_or_not,solved_path);
 
     if(button)
         return;
 }
-/*
-grayscale
-lighting / luminosité ++
-réduction du contraste
-binarisation
-inverser les couleurs : chiffres blancs fond noir
-sobel (philtre) : mise en avant des contours (lignes)
-*/
 
 //========================================
 
@@ -532,6 +609,12 @@ int main()
         .images =
         {
             .loaded_image = {NULL,NULL},
+            .grayscale = {NULL,NULL},
+            .lighting = {NULL,NULL},
+            .contrast = {NULL,NULL},
+            .binarisation = {NULL,NULL},
+            .invert = {NULL,NULL},
+            .sobel = {NULL,NULL},
             .solved_sudoku = {"not_solved.png",NULL},
             .initial_sudoku = {"solved.png",NULL}
         }
