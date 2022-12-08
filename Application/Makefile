@@ -1,10 +1,10 @@
 #Makefile
 
 CC = gcc
-CFLAGS = `pkg-config --cflags gtk+-3.0` -Wall -Wextra
-LDLIBS = `pkg-config --libs gtk+-3.0`
+CFLAGS = `pkg-config --cflags gtk+-3.0 sdl2 SDL2_image` -Wall -Wextra
+LDLIBS = `pkg-config --libs gtk+-3.0 sdl2 SDL2_image`
 
-SRC = application.c ../solver/solver.c ../solver/saver.c
+SRC = application.c ../solver/solver.c ../solver/saver.c ../imageTreatment/apply_image.c
 SRC2 = police.c
 EXE = main
 

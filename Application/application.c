@@ -93,6 +93,8 @@ void set_active_save_button(Data* data,gboolean active)
 
 //============IMAGE FUNCTIONS=============
 
+
+
 guchar** load_number_images()
 {
     size_t image_size = square_size * square_size;
@@ -299,6 +301,8 @@ void cycle_images(Data* data,int delta)
     if(newstate < 0 || newstate > data->max_state)
         return;
     
+    set_active_cycle_buttons(data,TRUE);
+    
     data->state = newstate;
     
     GdkPixbuf* pixbuf = NULL;
@@ -306,12 +310,14 @@ void cycle_images(Data* data,int delta)
     {
     case 0:
         pixbuf = data->images.loaded_image.image;
+        gtk_widget_set_sensitive(GTK_WIDGET(data->ui.cycle_left),FALSE);
         break;
     case unsolved_state:
         pixbuf = data->images.initial_sudoku.image;
         break;
     case solved_state:
         pixbuf = data->images.solved_sudoku.image;
+        gtk_widget_set_sensitive(GTK_WIDGET(data->ui.cycle_right),FALSE);
         break;
     
     default:
@@ -372,7 +378,6 @@ void solve_sudoku(Data* data,char* grid)
         grid_not_solved,grid,data->number_images);
         resize_image(data,&sudoku_image_solved);
         data->images.solved_sudoku.image = sudoku_image_solved;
-        //gtk_image_set_from_pixbuf(data->ui.image,sudoku_image_solved); //TODO
     }
     else
     {
@@ -401,7 +406,8 @@ void on_start(GtkButton* button,gpointer user_data)
     solve_sudoku(data,grid);
     free(grid);
     set_active_start_button(data,FALSE);
-    set_active_cycle_buttons(data,TRUE);
+    //set_active_cycle_buttons(data,TRUE);
+    cycle_images(data,0);
 
     if(button || user_data)
         return;
