@@ -484,7 +484,7 @@ void on_start(GtkButton* button,gpointer user_data)
 
     
     char* grid = calloc(grid_size_squared,sizeof(char)); //TODO
-    loadSudoku("../solver/solvable/s13.oku",grid); //TODO
+    loadSudoku("../solver/application_grids/s_mag.oku",grid); //TODO
     solve_sudoku(data,grid);
     free(grid);
     set_active_start_button(data,FALSE);
