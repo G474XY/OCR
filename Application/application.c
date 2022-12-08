@@ -32,16 +32,6 @@ const size_t grid_size_squared = grid_size * grid_size;
 const char* solved_path = "solved.png";
 const char* unsolved_path = "unsolved.png";
 
-const char* err_message = 
-    "There was an issue with the treatment of "
-   "your image. Please try again or, if the issue persists,"
-   "consider taking a different image.";
-
-const char* unsolvable_message = 
-    "The grid you are trying to solve is not solvable.\n\n"
-    "Note : this can be a malencontrous problem from our end.\n"
-    "If you are not sure, you can always try again.";
-
 
 //========================================
 
@@ -58,6 +48,7 @@ typedef struct UI
     GtkButton* cycle_left;
     GtkButton* cycle_right;
     GtkButton* rotate_button;
+    GtkButton* reset_button;
 } UI;
 
 typedef struct Image
@@ -107,6 +98,8 @@ void set_active_save_button(Data* data,gboolean active)
 void set_active_rotate_button(Data* data,gboolean active)
 {
     gtk_widget_set_sensitive(GTK_WIDGET(data->ui.rotate_button),active);
+    gtk_widget_set_sensitive(GTK_WIDGET(data->ui.reset_button),active);
+    gtk_widget_set_sensitive(GTK_WIDGET(data->ui.scale),active);
 }
 
 //========================================
@@ -586,6 +579,17 @@ void on_rotate(GtkButton* button,gpointer user_data)
         return;
 }
 
+void on_reset_rotation(GtkButton* button,gpointer user_data)
+{
+    Data* data = user_data;
+
+    gtk_range_set_value(data->ui.scale,0);
+    on_rotate(NULL,user_data);
+
+    if(button)
+        return;
+}
+
 
 //========================================
 
@@ -613,9 +617,12 @@ int main()
     gtk_widget_set_sensitive(GTK_WIDGET(cycleright),FALSE);
     GtkButton* rotatebutton = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.rotate"));
     gtk_widget_set_sensitive(GTK_WIDGET(rotatebutton),FALSE);
+    GtkButton* resetbutton = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.reset"));
+    gtk_widget_set_sensitive(GTK_WIDGET(resetbutton),FALSE);
 
     GtkRange* scale = GTK_RANGE(gtk_builder_get_object(builder,"ocr.scale"));
     gtk_range_set_range(scale,-180,180);
+    gtk_widget_set_sensitive(GTK_WIDGET(scale),FALSE);
 
     GtkWidget* image = GTK_WIDGET(gtk_builder_get_object(builder,"ocr.image"));
 
@@ -634,7 +641,8 @@ int main()
             .save_button = savebutton,
             .cycle_left = cycleleft,
             .cycle_right = cycleright,
-            .rotate_button = rotatebutton
+            .rotate_button = rotatebutton,
+            .reset_button = resetbutton
         },
         .images =
         {
@@ -657,6 +665,7 @@ int main()
     g_signal_connect(loadbutton,"file-set",G_CALLBACK(on_load_file),&data);
     g_signal_connect(savebutton,"clicked",G_CALLBACK(on_save),&data);
     g_signal_connect(rotatebutton,"clicked",G_CALLBACK(on_rotate),&data);
+    g_signal_connect(resetbutton,"clicked",G_CALLBACK(on_reset_rotation),&data);
     //g_signal_connect(window,"configure-event",G_CALLBACK(on_configure),&data);
     gtk_main();
 
