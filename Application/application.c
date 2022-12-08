@@ -50,14 +50,14 @@ const char* unsolvable_message =
 typedef struct UI
 {
     GtkImage* image;
-    //char* image_path;
+    GtkRange* scale;
     GtkWindow* window;
-    GtkFixed* fixed;
     GtkButton* start_button;
     GtkFileChooserButton* load_button;
     GtkButton* save_button;
     GtkButton* cycle_left;
     GtkButton* cycle_right;
+    GtkButton* rotate_button;
 } UI;
 
 typedef struct Image
@@ -102,6 +102,11 @@ void set_active_cycle_buttons(Data* data,gboolean active)
 void set_active_save_button(Data* data,gboolean active)
 {
     gtk_widget_set_sensitive(GTK_WIDGET(data->ui.save_button),active);
+}
+
+void set_active_rotate_button(Data* data,gboolean active)
+{
+    gtk_widget_set_sensitive(GTK_WIDGET(data->ui.rotate_button),active);
 }
 
 //========================================
@@ -325,7 +330,7 @@ void load_it_images(Data* data)
 {
     //Executes only if there is an image to compute
 
-    mkdir("tmp");
+    //mkdir("tmp");
     load_image(data->images.loaded_image.path);
     
     data->images.grayscale.path = grayscale_path;
@@ -355,6 +360,7 @@ void remove_it_images()
     remove(binarisation_path);
     remove(invert_path);
     remove(sobel_path);
+    remove(rotated_path);
 }
 
 void cycle_images(Data* data,int delta)
@@ -422,7 +428,7 @@ char pre_traitement(Data* data)
     }
 
     load_it_images(data);
-    remove_it_images();
+    //remove_it_images();
 
     return 0;
 }
@@ -485,10 +491,11 @@ void on_start(GtkButton* button,gpointer user_data)
 
     
     char* grid = calloc(grid_size_squared,sizeof(char)); //TODO
-    loadSudoku("../solver/solvable/s00.oku",grid); //TODO
+    loadSudoku("../solver/solvable/s13.oku",grid); //TODO
     solve_sudoku(data,grid);
     free(grid);
     set_active_start_button(data,FALSE);
+    set_active_rotate_button(data,TRUE);
     //set_active_cycle_buttons(data,TRUE);
     cycle_images(data,0);
 
@@ -502,6 +509,7 @@ void on_load_file(GtkFileChooserButton* button,gpointer user_data)
 
     set_active_cycle_buttons(data,FALSE);
     set_active_save_button(data,FALSE);
+    set_active_rotate_button(data,FALSE);
     data->max_state = 0;
     data->state = 0;
 
@@ -561,6 +569,25 @@ void on_save(GtkButton* button,gpointer user_data)
         return;
 }
 
+void on_rotate(GtkButton* button,gpointer user_data)
+{
+    Data* data = user_data;
+
+    double angle = gtk_range_get_value(data->ui.scale);
+    g_print("%lf\n",angle);
+
+    rotate_image(data->images.sobel.path,angle);
+    data->images.sobel.image = load_and_resize(data,rotated_path);
+    if(data->state == sobel_state)
+    {
+        gtk_image_set_from_pixbuf(data->ui.image,data->images.sobel.image);
+    }
+
+    if(button)
+        return;
+}
+
+
 //========================================
 
 
@@ -585,8 +612,11 @@ int main()
     GtkButton* cycleright = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.cycleright"));
     gtk_widget_set_sensitive(GTK_WIDGET(cycleleft),FALSE);
     gtk_widget_set_sensitive(GTK_WIDGET(cycleright),FALSE);
+    GtkButton* rotatebutton = GTK_BUTTON(gtk_builder_get_object(builder,"ocr.rotate"));
+    gtk_widget_set_sensitive(GTK_WIDGET(rotatebutton),FALSE);
 
-    GtkFixed* fixed = GTK_FIXED(gtk_builder_get_object(builder,"ocr.fixed"));
+    GtkRange* scale = GTK_RANGE(gtk_builder_get_object(builder,"ocr.scale"));
+    gtk_range_set_range(scale,-180,180);
 
     GtkWidget* image = GTK_WIDGET(gtk_builder_get_object(builder,"ocr.image"));
 
@@ -598,13 +628,14 @@ int main()
         .ui = 
         {
             .image = GTK_IMAGE(image),
+            .scale = scale,
             .window = window,
-            .fixed = fixed,
             .start_button = button,
             .load_button = loadbutton,
             .save_button = savebutton,
             .cycle_left = cycleleft,
-            .cycle_right = cycleright
+            .cycle_right = cycleright,
+            .rotate_button = rotatebutton
         },
         .images =
         {
@@ -626,6 +657,7 @@ int main()
     g_signal_connect(cycleright,"clicked",G_CALLBACK(on_cycle_right),&data);
     g_signal_connect(loadbutton,"file-set",G_CALLBACK(on_load_file),&data);
     g_signal_connect(savebutton,"clicked",G_CALLBACK(on_save),&data);
+    g_signal_connect(rotatebutton,"clicked",G_CALLBACK(on_rotate),&data);
     //g_signal_connect(window,"configure-event",G_CALLBACK(on_configure),&data);
     gtk_main();
 
@@ -633,23 +665,3 @@ int main()
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

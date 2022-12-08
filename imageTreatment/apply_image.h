@@ -13,6 +13,7 @@
 #define binarisation_path "tmp/s4.png"
 #define invert_path "tmp/s5.png"
 #define sobel_path "tmp/s6.png"
+#define rotated_path "tmp/rotated.png"
 
 
 void load_image(const char* path);
