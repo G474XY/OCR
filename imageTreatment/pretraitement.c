@@ -185,8 +185,8 @@ double find_threshold(SDL_Surface* surface, int h1, int h2, int w1, int w2)
         double varBetween = (double)wB * (double)wF * (mB - mF) * (mB - mF);
 
         if (varBetween > varMax) {
-        varMax = varBetween;
-        threshold = t;
+            varMax = varBetween;
+            threshold = t;
         }
     }
     return threshold;
@@ -307,12 +307,12 @@ void sobel(SDL_Surface* surface)
     double g_px;
 
     double kernel_x[3][3] = { { -1.0, 0.0, 1.0 },
-                              { -2.0, 0.0, 2.0 },
-                              { -1.0, 0.0, 1.0 } };
+        { -2.0, 0.0, 2.0 },
+        { -1.0, 0.0, 1.0 } };
 
     double kernel_y[3][3] = { { -1.0, -2.0, -1.0 },
-                              { 0.0, 0.0, 0.0 },
-                              { 1.0, 2.0, 1.0 } };
+        { 0.0, 0.0, 0.0 },
+        { 1.0, 2.0, 1.0 } };
 
     int h = surface->h;
     int w = surface->w;
@@ -341,4 +341,54 @@ void sobel(SDL_Surface* surface)
             pixels[i*w+j] = SDL_MapRGB(surface->format,r,g,b);
         }
     }
+}
+
+double degrees_to_rad(double d)
+{
+    return d * (3.14159265359 / 180);
+}
+
+
+void rotation(double angle, double x, double y,
+        double center_x, double center_y, double *rx, double *ry)
+{
+    *rx = (x - center_x) * cos(angle) - (y - center_y) * sin(angle) + center_x;
+    *ry = (x - center_x) * sin(angle) + (y - center_y) * cos(angle) + center_y;
+}
+
+SDL_Surface *rotate(SDL_Surface* s, double angle)
+{
+    SDL_Surface * rotated = copy_s(s);
+    angle = degrees_to_rad(angle);
+
+    int w = s->w;
+    int h = s->h;
+
+    double center_x = (h / (double)2);
+    double center_y = (w / (double)2);
+    for (int x = 0; x < h; x++)
+    {
+        for (int y = 0; y < w; y++)
+        {
+            double rx, ry;
+            rotation( angle, (double)x, (double)y, center_x, center_y, &rx, &ry);
+
+            if (0 <= rx && rx < h && 0 <= ry && ry < w)
+            {
+                Uint8 r, g, b;
+                Uint32* pixels = s->pixels;
+                SDL_GetRGB(pixels[(int)rx*w+(int)ry], s->format, &r,&g,&b);
+                Uint32* r_pixels = rotated->pixels;
+                r_pixels[x*w+y] = SDL_MapRGB(rotated->format,r,g,b);
+            }
+            else
+            {
+                Uint32* r_pixels = rotated->pixels;
+                r_pixels[x*w+y] = SDL_MapRGB(rotated->format,0,0,0);
+            }
+        }
+    }
+
+    return rotated;
+
 }

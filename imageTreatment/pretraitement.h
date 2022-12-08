@@ -27,4 +27,10 @@ Uint8 contrast(Uint8 c, double n);
 double convolution(SDL_Surface * s, double kernel[3][3], int row, int col);
 void sobel(SDL_Surface* surface);
 
+
+double degrees_to_rad(double d);
+void rotation(double angle, double x, double y,
+        double center_x, double center_y, double *rx, double *ry);
+SDL_Surface* rotate(SDL_Surface* s, double angle);
+
 # endif
